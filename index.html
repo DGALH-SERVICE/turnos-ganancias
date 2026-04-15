@@ -537,9 +537,13 @@ function apiCall(params) {
     const url = SCRIPT_URL + '?' + new URLSearchParams({...params, callback: cbName});
     const script = document.createElement('script');
     const timer = setTimeout(() => {
-      cleanup();
+      // No borramos el callback — Apps Script puede tardar con muchos datos
+      // Solo limpiamos el script tag
+      if (script.parentNode) script.parentNode.removeChild(script);
+      // Dejamos el callback activo 30s más por si llega tarde
+      setTimeout(() => { delete window[cbName]; }, 30000);
       reject(new Error('Timeout'));
-    }, 15000);
+    }, 30000);  // 30 segundos para dar tiempo a búsquedas en planillas grandes
     function cleanup() {
       clearTimeout(timer);
       delete window[cbName];
@@ -1012,4 +1016,3 @@ function fmtL(key) {
 </script>
 </body>
 </html>
-
