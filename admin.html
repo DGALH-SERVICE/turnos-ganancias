@@ -341,10 +341,6 @@ td.muted { color:#5C6478; }
               <th>Apellido y Nombre</th>
               <th>CUIL</th>
               <th>Modalidad</th>
-              <th>Repartición</th>
-              <th>Categoría</th>
-              <th>Contrato</th>
-              <th>Paga Gan.</th>
               <th>Teléfono</th>
               <th>Mail</th>
             </tr>
@@ -750,19 +746,16 @@ function renderTurnos(fecha) {
     tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Sin turnos para este día</td></tr>';
     return;
   }
+  // Las claves vienen en MAYUSCULAS desde el script
   tbody.innerHTML = currentTurnos.map(t => `
     <tr>
-      <td><span style="color:#00B4A6;font-weight:800">${t.numero}</span></td>
-      <td><strong>${t.hora} hs</strong></td>
-      <td>${t.nombre}</td>
-      <td class="muted">${t.cuil}</td>
-      <td><span class="badge ${t.modalidad==='presencial'?'badge-p':'badge-v'}">${t.modalidad==='presencial'?'🏛️ Presencial':'💻 Virtual'}</span></td>
-      <td class="muted" style="font-size:12px">${t.reparticion || '—'}</td>
-      <td class="muted" style="font-size:12px">${t.categoria || '—'}</td>
-      <td class="muted" style="font-size:12px">${t.modalidadContrato || '—'}</td>
-      <td style="font-size:12px;font-weight:700;color:${t.pagaGanancias==='SI'?'#00875A':'#5C6478'}">${t.pagaGanancias || '—'}</td>
-      <td class="muted">${t.telefono || '—'}</td>
-      <td class="muted" style="font-size:12px">${t.mail}</td>
+      <td><span style="color:#00B4A6;font-weight:800">${t.NUMERO||'—'}</span></td>
+      <td><strong>${t.HORA||'—'} hs</strong></td>
+      <td>${t.NOMBRE||'—'}</td>
+      <td class="muted">${t.CUIL||'—'}</td>
+      <td><span class="badge ${(t.MODALIDAD||'')==='presencial'?'badge-p':'badge-v'}">${(t.MODALIDAD||'')==='presencial'?'🏛️ Presencial':'💻 Virtual'}</span></td>
+      <td class="muted">${t.TELEFONO||'—'}</td>
+      <td class="muted" style="font-size:12px">${t.MAIL||'—'}</td>
     </tr>`).join('');
 }
 
@@ -874,4 +867,3 @@ document.getElementById('pwdInput').addEventListener('keydown', e => {
 </script>
 </body>
 </html>
-
