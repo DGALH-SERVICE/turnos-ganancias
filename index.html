@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Turnos — Asesoramiento Ganancias 2026 | GCABA</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Nunito Sans','Segoe UI',Arial,sans-serif; background:#F4F5F7; color:#1A1F2E; min-height:100vh; font-size:15px; }
+
+.hdr { background:#1A1F2E; position:sticky; top:0; z-index:100; }
+.hdr-top { max-width:1200px; margin:0 auto; padding:0 28px; display:flex; align-items:center; gap:14px; height:58px; }
+.logo-box { width:38px; height:38px; background:#00B4A6; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:800; color:#fff; letter-spacing:-0.5px; flex-shrink:0; }
+.logo-name { font-size:17px; font-weight:800; color:#fff; letter-spacing:-0.02em; }
+.hdr-sep { width:1px; height:22px; background:rgba(255,255,255,0.18); margin:0 4px; }
+.hdr-dept { font-size:12px; color:rgba(255,255,255,0.5); line-height:1.3; }
+.hdr-space { flex:1; }
+.hdr-pill { background:#00B4A6; color:#fff; font-size:11px; font-weight:700; padding:5px 13px; border-radius:20px; letter-spacing:.04em; text-transform:uppercase; }
+
+.stepsbar { background:#2C3347; border-top:1px solid rgba(255,255,255,0.07); }
+.steps-inner { max-width:1200px; margin:0 auto; padding:0 28px; display:flex; gap:2px; }
+.stab { display:flex; align-items:center; gap:8px; padding:10px 18px 10px 0; font-size:12px; font-weight:700; color:rgba(255,255,255,0.3); border-bottom:2px solid transparent; white-space:nowrap; cursor:default; transition:all .2s; user-select:none; }
+.stab.active { color:#00B4A6; border-bottom-color:#00B4A6; }
+.stab.done   { color:rgba(255,255,255,0.55); }
+.stab-num { width:20px; height:20px; border-radius:50%; background:rgba(255,255,255,0.1); font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.stab.active .stab-num { background:#00B4A6; color:#fff; }
+.stab.done   .stab-num { background:rgba(255,255,255,0.25); color:#fff; }
+
+.main { max-width:1200px; margin:0 auto; padding:32px 28px 80px; }
+.scr { display:none; }
+.scr.on { display:block; animation:fu .22s ease; }
+@keyframes fu { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+.scr-eye { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#00B4A6; margin-bottom:5px; }
+.scr-ttl { font-size:26px; font-weight:800; color:#1A1F2E; letter-spacing:-.02em; line-height:1.2; margin-bottom:6px; }
+.scr-sub { font-size:14px; color:#5C6478; line-height:1.5; }
+.scr-head { margin-bottom:26px; }
+
+.card { background:#fff; border:1px solid #DDE1EA; border-radius:12px; box-shadow:0 1px 4px rgba(26,31,46,0.08); }
+
+.fwrap { margin-bottom:17px; }
+.flbl { display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:#5C6478; margin-bottom:7px; }
+.finp { width:100%; padding:12px 15px; border:1.5px solid #DDE1EA; border-radius:8px; font-family:'Nunito Sans','Segoe UI',Arial,sans-serif; font-size:16px; color:#1A1F2E; background:#fff; outline:none; transition:border .18s,box-shadow .18s; }
+.finp:focus { border-color:#00B4A6; box-shadow:0 0 0 3px rgba(0,180,166,0.13); }
+.finp.ok  { border-color:#00875A; background:#E3FBF1; }
+.finp.err { border-color:#D93025; background:#FDECEA; }
+.fhint { font-size:11px; color:#9BA3B8; margin-top:5px; }
+.fhint.err { color:#D93025; font-weight:600; }
+.fhint.ok  { color:#00875A; font-weight:600; }
+
+/* ALERTAS */
+.alert { display:none; align-items:flex-start; gap:12px; padding:14px 16px; border-radius:10px; margin-top:12px; }
+.alert.show { display:flex; }
+.alert-err  { background:#FDECEA; border:1.5px solid #FFCDD2; color:#D93025; }
+.alert-warn { background:#FFFBEB; border:1.5px solid #FDE68A; color:#78350F; }
+.alert-info { background:#E6F8F7; border:1.5px solid #B3E8E5; color:#00524D; }
+.alert-ico  { font-size:18px; flex-shrink:0; margin-top:1px; }
+.alert-body { flex:1; font-size:13px; line-height:1.5; }
+.alert-body strong { display:block; font-size:14px; margin-bottom:4px; }
+
+/* TURNO VIGENTE */
+.turno-vigente-box {
+  display:none; background:#fff; border:1.5px solid #FDE68A;
+  border-radius:12px; padding:20px; margin-top:14px;
+}
+.turno-vigente-box.show { display:block; }
+.tv-head { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.tv-ico  { width:38px; height:38px; background:#FFF3CD; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.tv-ttl  { font-size:14px; font-weight:800; color:#1A1F2E; }
+.tv-sub  { font-size:12px; color:#5C6478; margin-top:2px; }
+.tv-datos { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; }
+.tv-dato  { background:#F4F5F7; border-radius:8px; padding:10px 12px; }
+.tv-dato-l { font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:#9BA3B8; font-weight:700; margin-bottom:2px; }
+.tv-dato-v { font-size:14px; font-weight:700; color:#1A1F2E; }
+
+/* VERIFICACIÓN DE MAIL (para modificar) */
+.verify-mail-box {
+  display:none; background:#F4F5F7; border:1.5px solid #DDE1EA;
+  border-radius:10px; padding:16px; margin-top:12px;
+}
+.verify-mail-box.show { display:block; }
+.verify-mail-ttl { font-size:12px; font-weight:700; color:#5C6478; text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px; }
+
+/* NOMBRE PREVIEW */
+.nprev { display:none; align-items:center; gap:12px; padding:13px 15px; background:#E3FBF1; border:1.5px solid #A3E6C8; border-radius:8px; margin-top:10px; }
+.nprev.show { display:flex; }
+.nprev-ico { width:34px; height:34px; background:#00875A; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:16px; flex-shrink:0; }
+.nprev-name { font-size:15px; font-weight:700; color:#1A1F2E; }
+.nprev-tag  { font-size:12px; font-weight:700; color:#00875A; margin-top:1px; }
+
+.ldots { display:none; padding:12px 0; text-align:center; }
+.ldots span { display:inline-block; width:7px; height:7px; background:#00B4A6; border-radius:50%; margin:0 3px; animation:ddd 1s infinite; }
+.ldots span:nth-child(2){animation-delay:.18s}
+.ldots span:nth-child(3){animation-delay:.36s}
+@keyframes ddd{0%,80%,100%{opacity:.2;transform:scale(.7)}40%{opacity:1;transform:scale(1)}}
+
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:13px 22px; border-radius:8px; font-family:'Nunito Sans','Segoe UI',Arial,sans-serif; font-size:14px; font-weight:700; cursor:pointer; border:none; transition:all .18s; text-decoration:none; width:100%; }
+.btn-teal  { background:#00B4A6; color:#fff; }
+.btn-teal:hover:not(:disabled) { background:#009990; transform:translateY(-1px); box-shadow:0 4px 14px rgba(0,180,166,0.3); }
+.btn-teal:disabled { opacity:.4; cursor:not-allowed; transform:none; box-shadow:none; }
+.btn-ghost { background:transparent; color:#5C6478; border:1.5px solid #DDE1EA; }
+.btn-ghost:hover { border-color:#00B4A6; color:#00B4A6; background:#E6F8F7; }
+.btn-yellow { background:#FFD200; color:#1A1F2E; }
+.btn-yellow:hover { background:#F5C800; transform:translateY(-1px); }
+.btn-back  { background:transparent; color:#5C6478; border:1.5px solid #DDE1EA; flex:1; }
+.btn-back:hover { border-color:#00B4A6; color:#00B4A6; background:#E6F8F7; }
+.btn-cfm   { background:#00B4A6; color:#fff; flex:2; }
+.btn-cfm:hover { background:#009990; }
+.btn-sm    { padding:8px 14px; font-size:12px; width:auto; }
+
+/* S1 */
+.s1w { max-width:520px; margin:0 auto; }
+
+/* S2 BOOKING */
+.bkgrid { display:grid; grid-template-columns:1fr 320px; gap:24px; align-items:start; }
+
+.cal { background:#fff; border:1px solid #DDE1EA; border-radius:12px; box-shadow:0 1px 4px rgba(26,31,46,0.08); overflow:hidden; margin-bottom:20px; }
+.cal-hd { background:#1A1F2E; padding:15px 22px; display:flex; align-items:center; justify-content:space-between; }
+.cal-nav { width:30px; height:30px; border:1px solid rgba(255,255,255,0.18); border-radius:6px; background:transparent; color:#fff; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; transition:background .14s; }
+.cal-nav:hover { background:rgba(255,255,255,0.12); }
+.cal-mlbl { font-size:17px; font-weight:800; color:#fff; }
+.cal-bd { padding:16px 18px 18px; }
+.cal-wd { display:grid; grid-template-columns:repeat(7,1fr); margin-bottom:5px; }
+.cal-wdn { text-align:center; font-size:10px; font-weight:700; color:#9BA3B8; text-transform:uppercase; letter-spacing:.05em; padding:2px 0; }
+.cal-dg { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+.cday { aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; border-radius:7px; cursor:pointer; transition:all .13s; position:relative; color:#1A1F2E; }
+.cday.empty { cursor:default; }
+.cday.dis   { color:#9BA3B8; cursor:not-allowed; font-weight:400; }
+.cday.cerrado { color:#D93025; cursor:not-allowed; font-weight:400; }
+.cday.cerrado::after { content:'🔒'; position:absolute; bottom:1px; left:50%; transform:translateX(-50%); font-size:6px; }
+.cday.avail:hover { background:#E6F8F7; color:#00B4A6; }
+.cday.avail::after { content:''; position:absolute; bottom:3px; left:50%; transform:translateX(-50%); width:4px; height:4px; border-radius:50%; background:#00B4A6; }
+.cday.sel { background:#00B4A6 !important; color:#fff !important; }
+.cday.sel::after { background:#FFD200; }
+.cal-ft { padding:9px 18px; border-top:1px solid #DDE1EA; background:#F4F5F7; display:flex; gap:16px; flex-wrap:wrap; }
+.leg { display:flex; align-items:center; gap:6px; font-size:11px; color:#5C6478; font-weight:600; }
+.ld      { width:7px; height:7px; border-radius:50%; background:#00B4A6; }
+.ld.none { background:#DDE1EA; }
+.ld.lock { background:#D93025; }
+
+.mpills { display:flex; gap:8px; padding:15px 15px 0; }
+.mpill { flex:1; padding:9px 10px; border:1.5px solid #DDE1EA; border-radius:7px; background:#fff; font-family:'Nunito Sans','Segoe UI',Arial,sans-serif; font-size:12px; font-weight:700; cursor:pointer; text-align:center; transition:all .14s; color:#5C6478; }
+.mpill.on { border-color:#00B4A6; background:#E6F8F7; color:#00B4A6; }
+
+.scard { background:#fff; border:1px solid #DDE1EA; border-radius:12px; box-shadow:0 1px 4px rgba(26,31,46,0.08); overflow:hidden; }
+.shd { padding:15px 17px; border-bottom:1px solid #DDE1EA; border-top:1px solid #DDE1EA; margin-top:12px; }
+.shd-date { font-size:15px; font-weight:700; color:#1A1F2E; }
+.shd-sub  { font-size:12px; color:#5C6478; margin-top:2px; }
+.slist { padding:11px; display:flex; flex-direction:column; gap:7px; max-height:300px; overflow-y:auto; }
+.slot { display:flex; align-items:center; justify-content:space-between; padding:11px 13px; border:1.5px solid #DDE1EA; border-radius:8px; cursor:pointer; transition:all .14s; }
+.slot:hover:not(.sfull) { border-color:#00B4A6; background:#E6F8F7; }
+.slot.ssel  { border-color:#00B4A6; background:#E6F8F7; }
+.slot.sfull { opacity:.42; cursor:not-allowed; }
+.slot-t { font-size:16px; font-weight:800; color:#1A1F2E; }
+.slot-r { display:flex; align-items:center; gap:8px; }
+.sbadge { font-size:10px; font-weight:700; padding:3px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:.04em; }
+.sp { background:#FFF3CD; color:#856404; }
+.sv { background:#E6F8F7; color:#009990; }
+.scupos { font-size:11px; font-weight:600; color:#5C6478; }
+.scupos.low { color:#D93025; }
+.sempty { padding:32px 16px; text-align:center; font-size:13px; color:#9BA3B8; }
+
+.pcard { background:#fff; border:1px solid #DDE1EA; border-radius:12px; box-shadow:0 1px 4px rgba(26,31,46,0.08); overflow:hidden; margin-bottom:13px; }
+.phd   { padding:12px 17px; border-bottom:1px solid #DDE1EA; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:#5C6478; background:#F4F5F7; }
+.pbd   { padding:14px 17px; display:flex; flex-direction:column; gap:10px; }
+.prow  { display:flex; justify-content:space-between; gap:10px; }
+.pk    { font-size:12px; color:#5C6478; font-weight:600; flex-shrink:0; }
+.pv    { font-size:13px; font-weight:700; color:#1A1F2E; text-align:right; }
+.pv.mt { color:#9BA3B8; font-weight:400; font-style:italic; }
+.ctp   { padding:15px 17px; }
+.ctp .fwrap { margin-bottom:12px; }
+.ctp .finp  { font-size:14px; padding:10px 13px; }
+
+/* S3 CONFIRM */
+.cfw { max-width:580px; margin:0 auto; }
+.cfcard { background:#fff; border:1px solid #DDE1EA; border-radius:12px; box-shadow:0 4px 16px rgba(26,31,46,0.10); overflow:hidden; margin-bottom:18px; }
+.cfbanner { background:#1A1F2E; padding:22px 26px; display:flex; align-items:center; gap:14px; }
+.cfbico { width:46px; height:46px; background:#00B4A6; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+.cfbanner h3 { font-size:18px; font-weight:800; color:#fff; margin-bottom:2px; }
+.cfbanner p  { font-size:13px; color:rgba(255,255,255,0.55); }
+.cfbody { padding:22px 26px; }
+.cfgrid { display:grid; grid-template-columns:1fr 1fr; gap:11px; margin-bottom:17px; }
+.cfi { padding:13px 14px; background:#F4F5F7; border-radius:8px; border:1px solid #DDE1EA; }
+.cfi-l { font-size:10px; text-transform:uppercase; letter-spacing:.07em; color:#9BA3B8; font-weight:700; margin-bottom:4px; }
+.cfi-v { font-size:14px; font-weight:700; color:#1A1F2E; }
+.cfnotice { background:#FFFBEB; border:1px solid #FDE68A; border-radius:8px; padding:13px 15px; font-size:13px; color:#78350F; display:flex; gap:10px; line-height:1.5; }
+.cfactions { display:flex; gap:10px; }
+
+/* BANNER MODIFICACIÓN */
+.mod-banner { background:#FFF3CD; border:1.5px solid #FDE68A; border-radius:10px; padding:13px 16px; margin-bottom:18px; display:none; font-size:13px; color:#78350F; display:flex; align-items:center; gap:10px; }
+.mod-banner.show { display:flex; }
+
+/* S4 SUCCESS */
+.sucw { max-width:500px; margin:44px auto 0; text-align:center; }
+.sico { width:76px; height:76px; background:#E3FBF1; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 22px; border:2px solid #A3E6C8; font-size:32px; animation:popIn .4s cubic-bezier(.175,.885,.32,1.275); }
+@keyframes popIn{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+.sttl { font-size:28px; font-weight:800; color:#1A1F2E; margin-bottom:9px; letter-spacing:-.02em; }
+.ssub { font-size:14px; color:#5C6478; line-height:1.6; margin-bottom:26px; }
+.ticket { background:#fff; border:1px solid #DDE1EA; border-radius:12px; box-shadow:0 4px 16px rgba(26,31,46,0.10); overflow:hidden; margin-bottom:14px; text-align:left; }
+.tstripe { height:5px; background:linear-gradient(90deg,#00B4A6,#FFD200); }
+.tbody { padding:20px 22px; }
+.tid-l { font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:#9BA3B8; font-weight:700; margin-bottom:3px; }
+.tnum  { font-size:22px; font-weight:800; color:#00B4A6; letter-spacing:.04em; margin-bottom:17px; }
+.trows { display:flex; flex-direction:column; gap:9px; }
+.trow  { display:flex; justify-content:space-between; font-size:13px; }
+.trow span:first-child { color:#5C6478; font-weight:600; }
+.trow span:last-child  { font-weight:700; color:#1A1F2E; }
+.tdiv { border:none; border-top:1px dashed #DDE1EA; margin:13px 0; }
+.mtag { display:flex; align-items:center; gap:10px; padding:13px 15px; background:#E6F8F7; border-radius:8px; font-size:13px; color:#009990; font-weight:700; text-align:left; border:1px solid #B3E8E5; margin-bottom:14px; }
+
+.ftr { background:#1A1F2E; padding:17px 28px; margin-top:48px; }
+.ftr-in { max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.ftxt { font-size:12px; color:rgba(255,255,255,0.4); }
+.ftxt strong { color:rgba(255,255,255,0.65); }
+
+@media(max-width:800px){
+  .bkgrid{grid-template-columns:1fr}
+  .cfgrid{grid-template-columns:1fr}
+  .hdr-dept{display:none}
+  .stab span{display:none}
+  .tv-datos{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-top">
+    <div class="logo-box">BA</div>
+    <span class="logo-name">GCABA</span>
+    <div class="hdr-sep"></div>
+    <div class="hdr-dept">Dirección General de Administración y Liquidación de Haberes</div>
+    <div class="hdr-space"></div>
+    <div class="hdr-pill">Turnos en línea</div>
+  </div>
+  <div class="stepsbar">
+    <div class="steps-inner">
+      <div class="stab active" id="tab1"><div class="stab-num">1</div><span>Identificación</span></div>
+      <div class="stab" id="tab2"><div class="stab-num">2</div><span>Elegir turno</span></div>
+      <div class="stab" id="tab3"><div class="stab-num">3</div><span>Confirmar</span></div>
+      <div class="stab" id="tab4"><div class="stab-num">✓</div><span>Listo</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- ══ PASO 1: CUIL ══ -->
+  <div class="scr on" id="s1">
+    <div class="s1w">
+      <div class="scr-head">
+        <div class="scr-eye">Paso 1 de 3</div>
+        <div class="scr-ttl">Ingresá tu CUIL para comenzar</div>
+        <div class="scr-sub">Verificamos tus datos en el padrón de empleados del GCABA automáticamente.</div>
+      </div>
+      <div class="card" style="padding:26px">
+
+        <div class="fwrap">
+          <label class="flbl">CUIL</label>
+          <input class="finp" type="text" id="ci" placeholder="20-12345678-9" maxlength="13" oninput="fmtCUIL(this)">
+          <div class="fhint">Ingresá tu CUIL con o sin guiones</div>
+        </div>
+
+        <div class="ldots" id="ld"><span></span><span></span><span></span></div>
+
+        <!-- CUIL encontrado OK -->
+        <div class="nprev" id="np">
+          <div class="nprev-ico">👤</div>
+          <div>
+            <div class="nprev-name" id="npn">—</div>
+            <div class="nprev-tag">✓ Empleado verificado en el padrón</div>
+          </div>
+        </div>
+
+        <!-- Error: CUIL no encontrado -->
+        <div class="alert alert-err" id="cuilerr">
+          <div class="alert-ico">⚠️</div>
+          <div class="alert-body"><strong>CUIL no encontrado</strong>Verificá el número ingresado. Si el problema persiste, contactá a la DGALH.</div>
+        </div>
+
+        <!-- TURNO VIGENTE — fecha futura (más de 1 día hábil) -->
+        <div class="turno-vigente-box" id="tvBox">
+          <div class="tv-head">
+            <div class="tv-ico">📅</div>
+            <div>
+              <div class="tv-ttl">Ya tenés un turno agendado</div>
+              <div class="tv-sub">Si querés modificarlo, verificá tu identidad con el mail que registraste</div>
+            </div>
+          </div>
+          <div class="tv-datos">
+            <div class="tv-dato"><div class="tv-dato-l">Fecha</div><div class="tv-dato-v" id="tvFecha">—</div></div>
+            <div class="tv-dato"><div class="tv-dato-l">Hora</div><div class="tv-dato-v" id="tvHora">—</div></div>
+            <div class="tv-dato"><div class="tv-dato-l">Modalidad</div><div class="tv-dato-v" id="tvMod">—</div></div>
+            <div class="tv-dato"><div class="tv-dato-l">N° de turno</div><div class="tv-dato-v" id="tvNum">—</div></div>
+          </div>
+
+          <!-- Verificación de mail -->
+          <div class="verify-mail-box show" id="vmBox">
+            <div class="verify-mail-ttl">🔐 Verificación de identidad</div>
+            <div class="fwrap" style="margin-bottom:10px">
+              <label class="flbl">Ingresá el mail con el que registraste el turno</label>
+              <input class="finp" type="email" id="vmMail" placeholder="ejemplo@gmail.com" oninput="chkVerifyMail()" style="font-size:14px;padding:10px 13px">
+            </div>
+            <div class="alert alert-err" id="vmErr" style="margin-bottom:10px">
+              <div class="alert-ico">⚠️</div>
+              <div class="alert-body">El mail no coincide con el registrado. Verificá e intentá nuevamente.</div>
+            </div>
+            <button class="btn btn-yellow btn-sm" style="width:100%" id="btnModificar" onclick="iniciarModificacion()" disabled>
+              ✏️ Modificar mi turno
+            </button>
+          </div>
+        </div>
+
+        <!-- TURNO HOY / MAÑANA -->
+        <div class="alert alert-warn" id="tvProximo">
+          <div class="alert-ico">⏰</div>
+          <div class="alert-body" id="tvProximoTxt">
+            <strong>Turno muy próximo</strong>
+          </div>
+        </div>
+
+        <div style="margin-top:20px">
+          <button class="btn btn-teal" id="bs1" onclick="goS2()" disabled>Continuar →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PASO 2: CALENDARIO + SLOTS ══ -->
+  <div class="scr" id="s2">
+    <div class="scr-head">
+      <div class="scr-eye">Paso 2 de 3</div>
+      <div class="scr-ttl" id="s2Ttl">Elegí fecha, modalidad y horario</div>
+      <div class="scr-sub">Seleccioná un día disponible y el horario que mejor te convenga.</div>
+    </div>
+
+    <!-- Banner cuando es modificación -->
+    <div class="mod-banner" id="modBanner">
+      ✏️ <span>Estás <strong>modificando</strong> tu turno anterior. El nuevo turno reemplazará al existente.</span>
+    </div>
+
+    <div class="bkgrid">
+      <div>
+        <div class="cal">
+          <div class="cal-hd">
+            <button class="cal-nav" onclick="prevM()">&#8249;</button>
+            <div class="cal-mlbl" id="cml">—</div>
+            <button class="cal-nav" onclick="nextM()">&#8250;</button>
+          </div>
+          <div class="cal-bd">
+            <div class="cal-wd">
+              <div class="cal-wdn">Dom</div><div class="cal-wdn">Lun</div>
+              <div class="cal-wdn">Mar</div><div class="cal-wdn">Mié</div>
+              <div class="cal-wdn">Jue</div><div class="cal-wdn">Vie</div>
+              <div class="cal-wdn">Sáb</div>
+            </div>
+            <div class="cal-dg" id="cdg"></div>
+          </div>
+          <div class="cal-ft">
+            <div class="leg"><div class="ld"></div>Con turnos</div>
+            <div class="leg"><div class="ld none"></div>Sin disponibilidad</div>
+            <div class="leg"><div class="ld lock"></div>Cerrado</div>
+          </div>
+        </div>
+
+        <div class="scard">
+          <div class="mpills">
+            <button class="mpill on" id="mpp" onclick="setMod('presencial')">🏛️ Presencial</button>
+            <button class="mpill"    id="mpv" onclick="setMod('virtual')">💻 Virtual</button>
+          </div>
+          <div class="shd">
+            <div class="shd-date" id="sdtxt">Seleccioná un día en el calendario</div>
+            <div class="shd-sub"  id="ssub">Los horarios disponibles aparecerán aquí</div>
+          </div>
+          <div class="slist" id="sl"><div class="sempty">↑ Primero elegí un día</div></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="pcard">
+          <div class="phd">Resumen del turno</div>
+          <div class="pbd">
+            <div class="prow"><span class="pk">Empleado</span><span class="pv" id="pn">—</span></div>
+            <div class="prow"><span class="pk">CUIL</span>    <span class="pv" id="pc">—</span></div>
+            <div class="prow"><span class="pk">Fecha</span>   <span class="pv mt" id="pf">Sin seleccionar</span></div>
+            <div class="prow"><span class="pk">Horario</span> <span class="pv mt" id="ph">Sin seleccionar</span></div>
+            <div class="prow"><span class="pk">Modalidad</span><span class="pv mt" id="pm">Sin seleccionar</span></div>
+          </div>
+        </div>
+
+        <div class="pcard">
+          <div class="phd">Datos de contacto</div>
+          <div class="ctp">
+            <div class="fwrap">
+              <label class="flbl">Teléfono</label>
+              <input class="finp" type="tel" id="ti" placeholder="11 1234-5678" oninput="chk2()">
+            </div>
+            <!-- Mail con doble verificación -->
+            <div class="fwrap">
+              <label class="flbl">Mail personal</label>
+              <input class="finp" type="email" id="mi" placeholder="ejemplo@gmail.com"
+                oninput="chkMailMatch()" autocomplete="off">
+              <div class="fhint">Recibirás la confirmación aquí</div>
+            </div>
+            <div class="fwrap" style="margin-bottom:0">
+              <label class="flbl">Repetí tu mail</label>
+              <input class="finp" type="email" id="mi2" placeholder="ejemplo@gmail.com"
+                oninput="chkMailMatch()" autocomplete="off" onpaste="return false">
+              <div class="fhint" id="mailMatchHint">Ingresá el mail nuevamente para confirmar</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-teal" id="bs2" onclick="goS3()" disabled>Revisar y confirmar →</button>
+        <div style="margin-top:10px">
+          <button class="btn btn-ghost" onclick="back(2)">← Volver</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PASO 3: CONFIRMAR ══ -->
+  <div class="scr" id="s3">
+    <div class="cfw">
+      <div class="scr-head">
+        <div class="scr-eye">Paso 3 de 3</div>
+        <div class="scr-ttl" id="s3Ttl">Confirmá tu turno</div>
+        <div class="scr-sub">Revisá los datos. Podrás cancelar o modificar desde el mail de confirmación.</div>
+      </div>
+      <div class="cfcard">
+        <div class="cfbanner">
+          <div class="cfbico" id="cfBico">📋</div>
+          <div>
+            <h3 id="cfBannerTtl">Revisión final</h3>
+            <p>Verificá que todos los datos sean correctos</p>
+          </div>
+        </div>
+        <div class="cfbody">
+          <div class="cfgrid">
+            <div class="cfi"><div class="cfi-l">Empleado</div> <div class="cfi-v" id="cfn">—</div></div>
+            <div class="cfi"><div class="cfi-l">CUIL</div>      <div class="cfi-v" id="cfc">—</div></div>
+            <div class="cfi"><div class="cfi-l">Fecha</div>     <div class="cfi-v" id="cff">—</div></div>
+            <div class="cfi"><div class="cfi-l">Horario</div>   <div class="cfi-v" id="cfh">—</div></div>
+            <div class="cfi"><div class="cfi-l">Modalidad</div> <div class="cfi-v" id="cfm">—</div></div>
+            <div class="cfi"><div class="cfi-l">Mail</div>      <div class="cfi-v" id="cfe" style="font-size:12px;word-break:break-all">—</div></div>
+          </div>
+          <div class="cfnotice" id="cfNotice">
+            <span>📧</span>
+            <span id="cfNoticeTxt">Recibirás un correo con los detalles y un enlace para <strong>cancelar o modificar</strong> tu turno en cualquier momento.</span>
+          </div>
+        </div>
+      </div>
+      <div class="alert alert-err" id="s3err" style="margin-bottom:14px">
+        <div class="alert-ico">⚠️</div>
+        <div class="alert-body"><span id="s3errtxt">Error al confirmar.</span></div>
+      </div>
+      <div class="cfactions">
+        <button class="btn btn-back" onclick="back(3)">← Modificar</button>
+        <button class="btn btn-cfm"  id="bcfm" onclick="confirmar()">✓ Confirmar turno</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PASO 4: ÉXITO ══ -->
+  <div class="scr" id="s4">
+    <div class="sucw">
+      <div class="sico" id="sucIco">✅</div>
+      <div class="sttl" id="sucTtl">¡Turno confirmado!</div>
+      <div class="ssub">Tu turno fue registrado correctamente. Guardá el número y revisá tu casilla de correo.</div>
+      <div class="ticket">
+        <div class="tstripe"></div>
+        <div class="tbody">
+          <div class="tid-l">Número de turno</div>
+          <div class="tnum" id="tkn">GCABA-2026-00000</div>
+          <hr class="tdiv">
+          <div class="trows">
+            <div class="trow"><span>Empleado</span>   <span id="tke">—</span></div>
+            <div class="trow"><span>Fecha y hora</span><span id="tkf">—</span></div>
+            <div class="trow"><span>Modalidad</span>  <span id="tkm">—</span></div>
+            <div class="trow"><span>Estado</span>     <span style="color:#00875A">✓ Confirmado</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="mtag">📬 Se envió confirmación a tu mail con el enlace para cancelar o modificar.</div>
+      <button class="btn btn-ghost" onclick="reset_()">Sacar otro turno</button>
+    </div>
+  </div>
+
+</main>
+
+<footer class="ftr">
+  <div class="ftr-in">
+    <div class="ftxt"><strong>GCABA</strong> — Dirección General de Administración y Liquidación de Haberes</div>
+    <div class="ftxt">Turnos para asesoramiento por el Ajuste anual del Impuesto a las Ganancias 2026</div>
+  </div>
+</footer>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBmU6C2Iw7XBTl-ejroqAp1lEF3IrqjkjGqR1nz-8rMIUdlCtgL4mIHVTPi7BZ5h8d/exec';
+
+// ── CONSTANTES ────────────────────────────────────────────
+const MN = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const DN = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+
+// ── ESTADO ────────────────────────────────────────────────
+let ST = {
+  cuil:'', nom:'', date:null, slotObj:null, mod:'presencial',
+  tel:'', mail:'', mon:null, diasDisp:{},
+  // Modificación
+  esModificacion: false,
+  tokenAnterior: null,
+  mailVerificado: false,
+  turnoVigente: null,   // datos del turno vigente si existe
+  corteFecha: null,     // fecha mínima reservable (calculada por el servidor)
+};
+
+// ── INIT ─────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const hoy = new Date();
+  ST.mon = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  // Si viene con token de modificación desde el mail
+  const params = new URLSearchParams(window.location.search);
+  const tokenMod = params.get('modificar');
+  if (tokenMod) cargarModificacionDesdeToken(tokenMod);
+});
+
+// ── API ───────────────────────────────────────────────────
+async function api(params) {
+  const r = await fetch(SCRIPT_URL + '?' + new URLSearchParams(params), { redirect:'follow' });
+  return r.json();
+}
+async function apiPost(body) {
+  const r = await fetch(SCRIPT_URL, {
+    method:'POST', redirect:'follow',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(body),
+  });
+  return r.json();
+}
+
+// ── CUIL ─────────────────────────────────────────────────
+let cuilTimer = null;
+function fmtCUIL(inp) {
+  let v = inp.value.replace(/\D/g,'').slice(0,11);
+  let f = v;
+  if(v.length>2)  f = v.slice(0,2)+'-'+v.slice(2);
+  if(v.length>10) f = v.slice(0,2)+'-'+v.slice(2,10)+'-'+v.slice(10);
+  inp.value = f; ST.cuil = v;
+
+  // Reset UI
+  ocultarTodos();
+  inp.classList.remove('ok','err');
+  document.getElementById('bs1').disabled = true;
+  clearTimeout(cuilTimer);
+
+  if (v.length === 11) {
+    document.getElementById('ld').style.display = 'block';
+    cuilTimer = setTimeout(() => buscarCUIL(v), 450);
+  } else {
+    document.getElementById('ld').style.display = 'none';
+  }
+}
+
+function ocultarTodos() {
+  document.getElementById('np').classList.remove('show');
+  document.getElementById('cuilerr').classList.remove('show');
+  document.getElementById('tvBox').classList.remove('show');
+  document.getElementById('tvProximo').classList.remove('show');
+  ST.turnoVigente = null;
+  ST.esModificacion = false;
+  ST.tokenAnterior = null;
+  ST.mailVerificado = false;
+}
+
+async function buscarCUIL(cuil) {
+  try {
+    const res = await api({ action: 'cuil', cuil });
+    document.getElementById('ld').style.display = 'none';
+
+    if (!res.ok || !res.data.found) {
+      document.getElementById('ci').classList.add('err');
+      document.getElementById('cuilerr').classList.add('show');
+      return;
+    }
+
+    ST.nom = res.data.nombre;
+    document.getElementById('npn').textContent = res.data.nombre;
+    document.getElementById('np').classList.add('show');
+    document.getElementById('ci').classList.add('ok');
+
+    // Verificar si tiene turno vigente
+    if (res.data.turnoVigente) {
+      const tv = res.data.turnoVigente;
+      ST.turnoVigente = tv;
+
+      if (tv.tipo === 'hoy_manana') {
+        // Turno hoy o mañana → aviso, puede seguir reservando para fechas futuras
+        const dia = tv.tipo === 'hoy_manana' && tv.esHoy ? 'hoy' : 'mañana';
+        document.getElementById('tvProximoTxt').innerHTML =
+          `<strong>Ya tenés un turno para ${dia}</strong>
+           Tenés un turno el <strong>${tv.fecha}</strong> a las <strong>${tv.hora} hs</strong> (${tv.modalidad}).
+           Si necesitás cambiar la fecha, podés reservar un nuevo turno para una fecha posterior — 
+           el anterior quedará cancelado automáticamente.`;
+        document.getElementById('tvProximo').classList.add('show');
+        // Deja continuar igualmente
+        document.getElementById('bs1').disabled = false;
+      } else {
+        // Turno futuro (más de 1 día hábil) → debe modificar
+        document.getElementById('tvFecha').textContent = tv.fecha;
+        document.getElementById('tvHora').textContent  = tv.hora + ' hs';
+        document.getElementById('tvMod').textContent   = tv.modalidad === 'presencial' ? '🏛️ Presencial' : '💻 Virtual';
+        document.getElementById('tvNum').textContent   = tv.numero;
+        document.getElementById('tvBox').classList.add('show');
+        document.getElementById('vmErr').classList.remove('show');
+        document.getElementById('vmMail').value = '';
+        document.getElementById('btnModificar').disabled = true;
+        // No habilita "Continuar" — debe usar el botón Modificar
+        document.getElementById('bs1').disabled = true;
+      }
+    } else {
+      // Sin turno vigente → puede continuar normalmente
+      document.getElementById('bs1').disabled = false;
+    }
+
+  } catch(e) {
+    document.getElementById('ld').style.display = 'none';
+    document.getElementById('cuilerr').classList.add('show');
+  }
+}
+
+// ── VERIFICACIÓN DE MAIL PARA MODIFICAR ──────────────────
+function chkVerifyMail() {
+  const mail = document.getElementById('vmMail').value.trim();
+  const tv   = ST.turnoVigente;
+  if (!mail || !tv) return;
+
+  // Comparación contra el mail del turno vigente (viene del server)
+  const coincide = mail.toLowerCase() === (tv.mail || '').toLowerCase();
+  document.getElementById('vmErr').classList.toggle('show', mail.length > 5 && !coincide);
+  document.getElementById('btnModificar').disabled = !coincide;
+}
+
+function iniciarModificacion() {
+  const tv = ST.turnoVigente;
+  if (!tv) return;
+  ST.esModificacion = true;
+  ST.tokenAnterior  = tv.token;
+  ST.mailVerificado = true;
+  // Pre-cargar el mail verificado en el paso 2
+  ST._mailVerificadoValor = tv.mail;
+  goS2();
+}
+
+// ── MODIFICACIÓN DESDE MAIL ───────────────────────────────
+async function cargarModificacionDesdeToken(token) {
+  try {
+    const res = await api({ action: 'datosPorToken', token });
+    if (res.ok && res.data.found) {
+      const t = res.data;
+      // Simular el flujo: pre-cargar CUIL y nombre, marcar como modificación
+      ST.cuil           = t.cuil;
+      ST.nom            = t.nombre;
+      ST.esModificacion = true;
+      ST.tokenAnterior  = token;
+      ST._mailVerificadoValor = t.mail;
+      // Saltear paso 1 y mostrar paso 2 directamente
+      document.getElementById('pn').textContent = t.nombre;
+      document.getElementById('pc').textContent = t.cuil;
+      await cargarDiasDisponibles();
+      renderCal();
+      document.getElementById('modBanner').classList.add('show');
+      document.getElementById('s2Ttl').textContent = 'Elegí el nuevo horario';
+      show(2);
+    }
+  } catch(e) {}
+}
+
+// ── NAVEGACIÓN ────────────────────────────────────────────
+function show(n) {
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.stab').forEach((t,i)=>{
+    t.classList.remove('active','done');
+    if(i<n-1) t.classList.add('done');
+    if(i===n-1) t.classList.add('active');
+  });
+  document.getElementById('s'+n).classList.add('on');
+  window.scrollTo(0,0);
+}
+function back(f) { show(f-1); }
+
+async function goS2() {
+  document.getElementById('pn').textContent = ST.nom;
+  document.getElementById('pc').textContent = document.getElementById('ci').value || ST.cuil;
+
+  // Si es modificación mostrar banner y precargar mail
+  if (ST.esModificacion) {
+    document.getElementById('modBanner').classList.add('show');
+    document.getElementById('s2Ttl').textContent = 'Elegí el nuevo horario';
+    if (ST._mailVerificadoValor) {
+      document.getElementById('mi').value  = ST._mailVerificadoValor;
+      document.getElementById('mi2').value = ST._mailVerificadoValor;
+      document.getElementById('mi').classList.add('ok');
+      document.getElementById('mi2').classList.add('ok');
+      document.getElementById('mailMatchHint').textContent = '✓ Mail verificado';
+      document.getElementById('mailMatchHint').className = 'fhint ok';
+    }
+  } else {
+    document.getElementById('modBanner').classList.remove('show');
+    document.getElementById('s2Ttl').textContent = 'Elegí fecha, modalidad y horario';
+  }
+
+  show(2);
+  await cargarDiasDisponibles();
+  renderCal();
+}
+
+function goS3() {
+  const tel  = document.getElementById('ti').value.trim();
+  const mail = document.getElementById('mi').value.trim();
+  const mail2= document.getElementById('mi2').value.trim();
+  if (!tel)  { alert('Ingresá tu teléfono.'); return; }
+  if (!mail) { alert('Ingresá tu mail.'); return; }
+  if (mail.toLowerCase() !== mail2.toLowerCase()) { alert('Los mails no coinciden.'); return; }
+
+  ST.tel = tel; ST.mail = mail;
+
+  // Actualizar pantalla de confirmación
+  document.getElementById('cfn').textContent = ST.nom;
+  document.getElementById('cfc').textContent = document.getElementById('ci').value || ST.cuil;
+  document.getElementById('cff').textContent = fmtL(ST.date);
+  document.getElementById('cfh').textContent = ST.slotObj.hora + ' hs';
+  document.getElementById('cfm').textContent = ST.mod === 'presencial' ? '🏛️ Presencial' : '💻 Virtual';
+  document.getElementById('cfe').textContent = mail;
+
+  // Ajustar textos si es modificación
+  if (ST.esModificacion) {
+    document.getElementById('s3Ttl').textContent       = 'Confirmá la modificación';
+    document.getElementById('cfBico').textContent      = '✏️';
+    document.getElementById('cfBannerTtl').textContent = 'Modificación de turno';
+    document.getElementById('cfNoticeTxt').innerHTML   =
+      'Tu turno anterior será <strong>cancelado</strong> y se creará este nuevo. Recibirás un mail de confirmación con los nuevos datos.';
+  } else {
+    document.getElementById('s3Ttl').textContent       = 'Confirmá tu turno';
+    document.getElementById('cfBico').textContent      = '📋';
+    document.getElementById('cfBannerTtl').textContent = 'Revisión final';
+    document.getElementById('cfNoticeTxt').innerHTML   =
+      'Recibirás un correo con los detalles y un enlace para <strong>cancelar o modificar</strong> tu turno en cualquier momento.';
+  }
+
+  document.getElementById('s3err').classList.remove('show');
+  show(3);
+}
+
+async function confirmar() {
+  const btn = document.getElementById('bcfm');
+  btn.disabled = true;
+  btn.textContent = ST.esModificacion ? 'Modificando...' : 'Confirmando...';
+
+  try {
+    const body = {
+      action:    'reservar',
+      cuil:      ST.cuil || document.getElementById('ci').value.replace(/\D/g,''),
+      nombre:    ST.nom,
+      mail:      ST.mail,
+      telefono:  ST.tel,
+      fecha:     ST.date,
+      hora:      ST.slotObj.hora,
+      modalidad: ST.mod,
+      slotId:    ST.slotObj.slotId,
+      esModificacion:  ST.esModificacion,
+      tokenAnterior:   ST.tokenAnterior || null,
+    };
+
+    const res = await apiPost(body);
+
+    if (res.ok && res.data.ok) {
+      // Pantalla de éxito
+      document.getElementById('tkn').textContent = res.data.numero;
+      document.getElementById('tke').textContent = ST.nom;
+      document.getElementById('tkf').textContent = fmtL(ST.date) + ' · ' + ST.slotObj.hora + ' hs';
+      document.getElementById('tkm').textContent = ST.mod === 'presencial' ? '🏛️ Presencial' : '💻 Virtual';
+
+      if (ST.esModificacion) {
+        document.getElementById('sucIco').textContent = '✏️';
+        document.getElementById('sucTtl').textContent = '¡Turno modificado!';
+      } else {
+        document.getElementById('sucIco').textContent = '✅';
+        document.getElementById('sucTtl').textContent = '¡Turno confirmado!';
+      }
+      show(4);
+    } else {
+      const msg = (res.data && res.data.error) || res.error || 'Error desconocido';
+      document.getElementById('s3errtxt').textContent = msg;
+      document.getElementById('s3err').classList.add('show');
+      btn.disabled = false;
+      btn.textContent = ST.esModificacion ? '✏️ Confirmar modificación' : '✓ Confirmar turno';
+    }
+  } catch(e) {
+    document.getElementById('s3errtxt').textContent = 'Error de conexión. Intentá nuevamente.';
+    document.getElementById('s3err').classList.add('show');
+    btn.disabled = false;
+    btn.textContent = ST.esModificacion ? '✏️ Confirmar modificación' : '✓ Confirmar turno';
+  }
+}
+
+function reset_() {
+  ST = { cuil:'', nom:'', date:null, slotObj:null, mod:'presencial',
+         tel:'', mail:'', mon:new Date(), diasDisp:{},
+         esModificacion:false, tokenAnterior:null, mailVerificado:false, turnoVigente:null };
+  ST.mon = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  const ci = document.getElementById('ci');
+  if (ci) { ci.value=''; ci.classList.remove('ok','err'); }
+  document.getElementById('ti').value = '';
+  document.getElementById('mi').value = '';
+  document.getElementById('mi2').value = '';
+  document.getElementById('mailMatchHint').textContent = 'Ingresá el mail nuevamente para confirmar';
+  document.getElementById('mailMatchHint').className = 'fhint';
+  ocultarTodos();
+  document.getElementById('bs1').disabled = true;
+  show(1);
+}
+
+// ── DOUBLE MAIL CHECK ─────────────────────────────────────
+function chkMailMatch() {
+  const m1 = document.getElementById('mi').value.trim();
+  const m2 = document.getElementById('mi2').value.trim();
+  const hint = document.getElementById('mailMatchHint');
+
+  if (!m2) {
+    document.getElementById('mi').classList.remove('ok','err');
+    document.getElementById('mi2').classList.remove('ok','err');
+    hint.textContent = 'Ingresá el mail nuevamente para confirmar';
+    hint.className = 'fhint';
+  } else if (m1.toLowerCase() === m2.toLowerCase() && m1.includes('@')) {
+    document.getElementById('mi').classList.add('ok'); document.getElementById('mi').classList.remove('err');
+    document.getElementById('mi2').classList.add('ok'); document.getElementById('mi2').classList.remove('err');
+    hint.textContent = '✓ Los mails coinciden';
+    hint.className = 'fhint ok';
+  } else {
+    document.getElementById('mi').classList.add('err'); document.getElementById('mi').classList.remove('ok');
+    document.getElementById('mi2').classList.add('err'); document.getElementById('mi2').classList.remove('ok');
+    hint.textContent = '✗ Los mails no coinciden';
+    hint.className = 'fhint err';
+  }
+  chk2();
+}
+
+// ── CALENDARIO ────────────────────────────────────────────
+async function cargarDiasDisponibles() {
+  try {
+    const res = await api({ action: 'diasDisponibles' });
+    if (res.ok) {
+      ST.diasDisp  = res.data.dias    || {};
+      ST.corteFecha= res.data.corte   || null; // fecha mínima reservable (YYYY-MM-DD)
+    }
+  } catch(e) { ST.diasDisp = {}; ST.corteFecha = null; }
+}
+
+function renderCal() {
+  const d = ST.mon;
+  document.getElementById('cml').textContent = MN[d.getMonth()] + ' ' + d.getFullYear();
+  const first = new Date(d.getFullYear(), d.getMonth(), 1).getDay();
+  const tot   = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+  const g = document.getElementById('cdg');
+  g.innerHTML = '';
+
+  for (let i=0; i<first; i++) {
+    const e=document.createElement('div'); e.className='cday empty'; g.appendChild(e);
+  }
+  for (let day=1; day<=tot; day++) {
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const dow  = new Date(d.getFullYear(), d.getMonth(), day).getDay();
+    const wk   = dow===0 || dow===6;
+    const disp = ST.diasDisp[key];
+
+    // Verificar si está dentro del período de corte
+    const cerrado = ST.corteFecha && key <= ST.corteFecha;
+
+    const el = document.createElement('div');
+    el.className = 'cday';
+    el.textContent = day;
+
+    if (wk) {
+      el.classList.add('dis');
+    } else if (cerrado) {
+      el.classList.add('cerrado');
+      el.title = 'Reservas cerradas para este día';
+    } else if (disp) {
+      el.classList.add('avail');
+      el.onclick = () => selDate(key, el);
+    } else {
+      el.classList.add('dis');
+    }
+
+    if (ST.date === key) el.classList.add('sel');
+    g.appendChild(el);
+  }
+}
+
+function prevM() { ST.mon=new Date(ST.mon.getFullYear(),ST.mon.getMonth()-1,1); renderCal(); }
+function nextM() { ST.mon=new Date(ST.mon.getFullYear(),ST.mon.getMonth()+1,1); renderCal(); }
+
+async function selDate(key, el) {
+  ST.date=key; ST.slotObj=null;
+  document.querySelectorAll('.cday').forEach(d=>d.classList.remove('sel'));
+  el.classList.add('sel');
+  const p=key.split('-');
+  const dobj=new Date(+p[0],+p[1]-1,+p[2]);
+  const dn=DN[dobj.getDay()];
+  document.getElementById('sdtxt').textContent =
+    dn.charAt(0).toUpperCase()+dn.slice(1)+' '+parseInt(p[2])+' de '+MN[dobj.getMonth()];
+  document.getElementById('sl').innerHTML='<div class="sempty"><div class="ldots" style="display:block"><span></span><span></span><span></span></div></div>';
+  updSum(); chk2();
+  await renderSlots();
+}
+
+function setMod(m) {
+  ST.mod=m; ST.slotObj=null;
+  document.getElementById('mpp').classList.toggle('on',m==='presencial');
+  document.getElementById('mpv').classList.toggle('on',m==='virtual');
+  if(ST.date) renderSlots();
+  updSum(); chk2();
+}
+
+async function renderSlots() {
+  const lst = document.getElementById('sl');
+  try {
+    const res = await api({ action:'slots', date:ST.date });
+    if (!res.ok) { lst.innerHTML='<div class="sempty">Error cargando horarios.</div>'; return; }
+    const flt = res.data.filter(s=>s.modalidad===ST.mod);
+    if (!flt.length) {
+      lst.innerHTML=`<div class="sempty">No hay turnos ${ST.mod==='presencial'?'presenciales':'virtuales'} este día.<br>Probá con otra modalidad.</div>`;
+      document.getElementById('ssub').textContent='Sin disponibilidad para esta modalidad';
+      return;
+    }
+    const av = flt.filter(s=>!s.lleno).length;
+    document.getElementById('ssub').textContent = av+' horario'+(av!==1?'s':'')+' disponible'+(av!==1?'s':'');
+    lst.innerHTML='';
+    flt.forEach(slot=>{
+      const el=document.createElement('div');
+      el.className='slot'+(slot.lleno?' sfull':'')+(ST.slotObj&&ST.slotObj.slotId===slot.slotId?' ssel':'');
+      el.innerHTML=`<div class="slot-t">${slot.hora} hs</div>
+        <div class="slot-r">
+          <span class="sbadge ${slot.modalidad==='presencial'?'sp':'sv'}">${slot.modalidad==='presencial'?'🏛️ Presencial':'💻 Virtual'}</span>
+          <span class="scupos${slot.libres===1?' low':''}">${slot.lleno?'Completo':slot.libres+' lugar'+(slot.libres!==1?'es':'')}</span>
+        </div>`;
+      if(!slot.lleno) el.onclick=()=>{
+        ST.slotObj=slot;
+        document.querySelectorAll('.slot').forEach(s=>s.classList.remove('ssel'));
+        el.classList.add('ssel');
+        updSum(); chk2();
+      };
+      lst.appendChild(el);
+    });
+  } catch(e) {
+    lst.innerHTML='<div class="sempty">Error de conexión. Intentá nuevamente.</div>';
+  }
+}
+
+function updSum() {
+  const pf=document.getElementById('pf'), ph=document.getElementById('ph'), pm=document.getElementById('pm');
+  if(ST.date){pf.textContent=fmtL(ST.date);pf.classList.remove('mt');}
+  else{pf.textContent='Sin seleccionar';pf.classList.add('mt');}
+  if(ST.slotObj){ph.textContent=ST.slotObj.hora+' hs';ph.classList.remove('mt');}
+  else{ph.textContent='Sin seleccionar';ph.classList.add('mt');}
+  pm.textContent=ST.mod==='presencial'?'🏛️ Presencial':'💻 Virtual';
+  pm.classList.remove('mt');
+}
+
+function chk2() {
+  const tel  = document.getElementById('ti').value.trim();
+  const mail = document.getElementById('mi').value.trim();
+  const mail2= document.getElementById('mi2').value.trim();
+  const mailOk = mail.includes('@') && mail.toLowerCase()===mail2.toLowerCase();
+  document.getElementById('bs2').disabled = !(ST.date && ST.slotObj && tel.length>5 && mailOk);
+}
+
+function fmtL(key) {
+  if(!key) return '—';
+  const p=key.split('-');
+  const d=new Date(+p[0],+p[1]-1,+p[2]);
+  const dn=DN[d.getDay()];
+  return dn.charAt(0).toUpperCase()+dn.slice(1)+' '+parseInt(p[2])+' de '+MN[d.getMonth()]+' '+p[0];
+}
+</script>
+</body>
+</html>

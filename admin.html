@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Turnero GCABA</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Nunito Sans','Segoe UI',Arial,sans-serif; background:#F4F5F7; color:#1A1F2E; min-height:100vh; font-size:14px; }
+
+/* HEADER */
+.hdr { background:#1A1F2E; padding:0 28px; height:56px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+.hdr-l { display:flex; align-items:center; gap:12px; }
+.logo { background:#00B4A6; color:#fff; font-weight:800; font-size:14px; padding:6px 11px; border-radius:7px; }
+.hdr-title { font-size:15px; font-weight:700; color:#fff; }
+.hdr-sub { font-size:11px; color:rgba(255,255,255,0.45); margin-top:1px; }
+.hdr-badge { background:rgba(255,180,0,0.2); color:#FFD200; font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; border:1px solid rgba(255,210,0,0.3); }
+.btn-logout { background:transparent; border:1px solid rgba(255,255,255,0.2); color:rgba(255,255,255,0.6); padding:6px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s; }
+.btn-logout:hover { border-color:rgba(255,255,255,0.5); color:#fff; }
+
+/* LOGIN */
+.login-wrap { display:flex; align-items:center; justify-content:center; min-height:calc(100vh - 56px); padding:24px; }
+.login-box { background:#fff; border:1px solid #DDE1EA; border-radius:14px; padding:36px 32px; max-width:400px; width:100%; box-shadow:0 4px 20px rgba(26,31,46,0.10); }
+.login-icon { width:56px; height:56px; background:#E6F8F7; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px; margin-bottom:20px; }
+.login-ttl { font-size:22px; font-weight:800; color:#1A1F2E; margin-bottom:6px; }
+.login-sub { font-size:13px; color:#5C6478; margin-bottom:24px; line-height:1.5; }
+
+/* FIELDS */
+.flbl { display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:#5C6478; margin-bottom:6px; }
+.finp { width:100%; padding:11px 14px; border:1.5px solid #DDE1EA; border-radius:8px; font-family:inherit; font-size:15px; color:#1A1F2E; background:#fff; outline:none; transition:border .18s; }
+.finp:focus { border-color:#00B4A6; box-shadow:0 0 0 3px rgba(0,180,166,0.12); }
+.fwrap { margin-bottom:16px; }
+.err-msg { background:#FDECEA; border:1px solid #FFCDD2; color:#D93025; font-size:13px; font-weight:600; padding:10px 13px; border-radius:8px; margin-top:12px; display:none; }
+.err-msg.show { display:block; }
+
+/* BUTTONS */
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:7px; padding:11px 18px; border-radius:8px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; border:none; transition:all .17s; }
+.btn-teal { background:#00B4A6; color:#fff; }
+.btn-teal:hover { background:#009990; transform:translateY(-1px); }
+.btn-teal:disabled { opacity:.4; cursor:not-allowed; transform:none; }
+.btn-w100 { width:100%; }
+.btn-dark { background:#1A1F2E; color:#fff; }
+.btn-dark:hover { background:#2C3347; }
+.btn-ghost { background:transparent; color:#5C6478; border:1.5px solid #DDE1EA; }
+.btn-ghost:hover { border-color:#00B4A6; color:#00B4A6; background:#E6F8F7; }
+.btn-red { background:#FDECEA; color:#D93025; border:1.5px solid #FFCDD2; }
+.btn-red:hover { background:#FBDBD8; }
+.btn-sm { padding:7px 12px; font-size:12px; }
+.btn-yellow { background:#FFF8CC; color:#856404; border:1.5px solid #FDE68A; }
+.btn-yellow:hover { background:#FFF3B0; }
+
+/* MAIN LAYOUT */
+.admin-wrap { display:none; max-width:1200px; margin:0 auto; padding:28px 28px 60px; }
+.admin-wrap.show { display:block; }
+
+/* TABS */
+.tabs { display:flex; gap:4px; margin-bottom:24px; background:#fff; padding:5px; border-radius:10px; border:1px solid #DDE1EA; box-shadow:0 1px 3px rgba(26,31,46,0.06); width:fit-content; }
+.tab { padding:9px 20px; border-radius:7px; font-size:13px; font-weight:700; cursor:pointer; color:#5C6478; border:none; background:transparent; font-family:inherit; transition:all .15s; }
+.tab.on { background:#1A1F2E; color:#fff; }
+.tab:hover:not(.on) { background:#F4F5F7; color:#1A1F2E; }
+
+/* PANEL: GESTIÓN DE SLOTS */
+.panel { display:none; }
+.panel.on { display:block; }
+
+.section-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+.section-ttl { font-size:18px; font-weight:800; color:#1A1F2E; }
+.section-sub { font-size:13px; color:#5C6478; margin-top:2px; }
+
+.date-nav { display:flex; align-items:center; gap:10px; margin-bottom:20px; }
+.date-nav-btn { width:34px; height:34px; border:1.5px solid #DDE1EA; border-radius:7px; background:#fff; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; transition:all .14s; color:#5C6478; }
+.date-nav-btn:hover { border-color:#00B4A6; color:#00B4A6; }
+.date-display { font-size:16px; font-weight:800; color:#1A1F2E; min-width:200px; text-align:center; }
+.date-input { padding:9px 13px; border:1.5px solid #DDE1EA; border-radius:8px; font-family:inherit; font-size:14px; color:#1A1F2E; background:#fff; outline:none; cursor:pointer; }
+.date-input:focus { border-color:#00B4A6; }
+
+/* SLOT GRID */
+.slots-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; margin-bottom:24px; }
+.slot-card { background:#fff; border:1.5px solid #DDE1EA; border-radius:10px; padding:15px 16px; display:flex; align-items:center; justify-content:space-between; transition:all .15s; }
+.slot-card:hover { box-shadow:0 2px 8px rgba(26,31,46,0.08); }
+.slot-card.inactivo { opacity:.55; background:#F4F5F7; }
+.slot-card.lleno { border-color:#FDE68A; background:#FFFBEB; }
+.slot-info { flex:1; }
+.slot-hora { font-size:18px; font-weight:800; color:#1A1F2E; }
+.slot-mod-badge { font-size:10px; font-weight:700; padding:2px 7px; border-radius:20px; text-transform:uppercase; letter-spacing:.04em; margin-top:4px; display:inline-block; }
+.sbp { background:#FFF3CD; color:#856404; }
+.sbv { background:#E6F8F7; color:#009990; }
+.slot-cupos-bar { margin-top:8px; }
+.cupos-txt { font-size:11px; color:#5C6478; font-weight:600; margin-bottom:4px; }
+.cupos-bar { height:4px; background:#DDE1EA; border-radius:2px; overflow:hidden; }
+.cupos-fill { height:100%; background:#00B4A6; border-radius:2px; transition:width .3s; }
+.cupos-fill.full { background:#D93025; }
+.cupos-fill.warn { background:#FFD200; }
+.slot-actions { display:flex; flex-direction:column; gap:6px; margin-left:12px; }
+
+/* ADD SLOT FORM */
+.add-form-card { background:#fff; border:1.5px solid #DDE1EA; border-radius:12px; padding:22px; margin-bottom:24px; }
+.add-form-ttl { font-size:15px; font-weight:800; color:#1A1F2E; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+.add-form-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr auto; gap:12px; align-items:end; }
+.fsel { width:100%; padding:10px 13px; border:1.5px solid #DDE1EA; border-radius:8px; font-family:inherit; font-size:14px; color:#1A1F2E; background:#fff; outline:none; cursor:pointer; }
+.fsel:focus { border-color:#00B4A6; }
+
+/* STATS ROW */
+.stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:24px; }
+.stat-card { background:#fff; border:1px solid #DDE1EA; border-radius:10px; padding:16px 18px; }
+.stat-num { font-size:28px; font-weight:800; color:#1A1F2E; line-height:1; margin-bottom:4px; }
+.stat-num.teal { color:#00B4A6; }
+.stat-num.yellow { color:#856404; }
+.stat-num.red { color:#D93025; }
+.stat-lbl { font-size:12px; color:#5C6478; font-weight:600; }
+
+/* PANEL: TURNOS DEL DÍA */
+.table-wrap { background:#fff; border:1px solid #DDE1EA; border-radius:12px; overflow:hidden; }
+.table-head { background:#1A1F2E; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; }
+.table-head-ttl { font-size:14px; font-weight:700; color:#fff; }
+.table-head-sub { font-size:12px; color:rgba(255,255,255,0.5); }
+table { width:100%; border-collapse:collapse; }
+thead tr { background:#F4F5F7; border-bottom:1px solid #DDE1EA; }
+th { padding:11px 16px; text-align:left; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#5C6478; }
+tbody tr { border-bottom:1px solid #F4F5F7; transition:background .12s; }
+tbody tr:hover { background:#F8F9FC; }
+tbody tr:last-child { border-bottom:none; }
+td { padding:12px 16px; font-size:13px; color:#1A1F2E; }
+td.muted { color:#5C6478; }
+.badge { font-size:10px; font-weight:700; padding:3px 8px; border-radius:20px; text-transform:uppercase; letter-spacing:.04em; }
+.badge-p { background:#FFF3CD; color:#856404; }
+.badge-v { background:#E6F8F7; color:#009990; }
+.badge-act { background:#E3FBF1; color:#00875A; }
+.empty-row td { text-align:center; color:#9BA3B8; padding:40px; }
+
+/* TOAST */
+.toast { position:fixed; bottom:24px; right:24px; background:#1A1F2E; color:#fff; padding:13px 18px; border-radius:10px; font-size:13px; font-weight:600; z-index:999; opacity:0; transform:translateY(10px); transition:all .25s; pointer-events:none; display:flex; align-items:center; gap:8px; box-shadow:0 4px 16px rgba(0,0,0,0.2); }
+.toast.show { opacity:1; transform:translateY(0); }
+.toast.ok   { border-left:4px solid #00B4A6; }
+.toast.err  { border-left:4px solid #D93025; }
+
+/* LOADING OVERLAY */
+.overlay { position:fixed; inset:0; background:rgba(26,31,46,0.5); z-index:200; display:none; align-items:center; justify-content:center; }
+.overlay.show { display:flex; }
+.overlay-box { background:#fff; border-radius:12px; padding:28px 32px; text-align:center; }
+.overlay-box p { font-size:14px; color:#5C6478; margin-top:10px; font-weight:600; }
+
+.ldots { display:inline-flex; }
+.ldots span { display:inline-block; width:8px; height:8px; background:#00B4A6; border-radius:50%; margin:0 3px; animation:ddd 1s infinite; }
+.ldots span:nth-child(2){animation-delay:.18s}
+.ldots span:nth-child(3){animation-delay:.36s}
+@keyframes ddd{0%,80%,100%{opacity:.2;transform:scale(.7)}40%{opacity:1;transform:scale(1)}}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .add-form-grid{grid-template-columns:1fr 1fr; }
+  .stats-row{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .add-form-grid{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .admin-wrap{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-l">
+    <div class="logo">BA</div>
+    <div>
+      <div class="hdr-title">Panel de Administración</div>
+      <div class="hdr-sub">Turnero — Asesoramiento Ganancias 2026</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="hdr-badge" id="adminBadge" style="display:none">● Sesión activa</div>
+    <button class="btn-logout" id="btnLogout" style="display:none" onclick="logout()">Cerrar sesión</button>
+  </div>
+</header>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-icon">🔐</div>
+    <div class="login-ttl">Acceso restringido</div>
+    <div class="login-sub">Este panel es exclusivo para administradores del sistema de turnos.</div>
+    <div class="fwrap">
+      <label class="flbl">Contraseña</label>
+      <input class="finp" type="password" id="pwdInput" placeholder="••••••••"
+        onkeydown="if(event.key==='Enter') doLogin()">
+    </div>
+    <div class="err-msg" id="loginErr">Contraseña incorrecta. Intentá nuevamente.</div>
+    <button class="btn btn-teal btn-w100" style="margin-top:8px" onclick="doLogin()">Ingresar →</button>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin-wrap" id="adminWrap">
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab on" onclick="switchTab('slots')">📅 Gestión de turnos</button>
+    <button class="tab" onclick="switchTab('turnos')">👥 Turnos del día</button>
+    <button class="tab" onclick="switchTab('stats')">📊 Resumen</button>
+  </div>
+
+  <!-- ── TAB: SLOTS ── -->
+  <div class="panel on" id="panel-slots">
+
+    <!-- CONFIG CORTE -->
+    <div class="add-form-card" style="margin-bottom:16px;border-left:4px solid #00B4A6">
+      <div class="add-form-ttl" style="margin-bottom:14px">⚙️ Configuración de corte de reservas</div>
+      <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap">
+        <div>
+          <label class="flbl">Hora de corte del día anterior</label>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+            <input class="date-input" type="number" id="horaCorte" min="0" max="23" value="10"
+              style="width:72px;text-align:center;font-size:22px;font-weight:800;padding:8px">
+            <span style="font-size:14px;color:#5C6478;font-weight:700">:00 hs</span>
+          </div>
+          <div style="font-size:11px;color:#9BA3B8;margin-top:5px;max-width:200px">
+            Hasta esta hora del día hábil anterior se pueden reservar turnos.
+          </div>
+        </div>
+        <div style="flex:1;min-width:220px">
+          <label class="flbl">Feriados</label>
+          <input class="date-input" type="text" id="feriadosInput"
+            placeholder="2026-05-25, 2026-07-09"
+            style="width:100%;margin-top:6px">
+          <div style="font-size:11px;color:#9BA3B8;margin-top:5px">
+            Fechas en formato YYYY-MM-DD separadas por coma.<br>
+            No se mostrarán como disponibles y no cuentan como día hábil para el cálculo del corte.
+          </div>
+        </div>
+        <div style="align-self:flex-end;padding-bottom:2px">
+          <button class="btn btn-teal btn-sm" onclick="guardarConfig()" style="width:auto">💾 Guardar configuración</button>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:10px 14px;background:#E6F8F7;border-radius:8px;font-size:12px;color:#00524D;font-weight:600;display:flex;align-items:center;gap:8px" id="corteInfo">
+        <span>⏳</span> <span>Cargando configuración actual...</span>
+      </div>
+    </div>
+
+    <!-- ADD SLOT FORM -->
+    <div class="add-form-card">
+      <div class="add-form-ttl">➕ Agregar nuevos turnos</div>
+      <div class="add-form-grid">
+        <div>
+          <label class="flbl">Fecha</label>
+          <input class="date-input" type="date" id="addFecha" style="width:100%">
+        </div>
+        <div>
+          <label class="flbl">Hora de inicio</label>
+          <input class="date-input" type="time" id="addHoraInicio" value="09:00" style="width:100%">
+        </div>
+        <div>
+          <label class="flbl">Hora de fin</label>
+          <input class="date-input" type="time" id="addHoraFin" value="13:00" style="width:100%">
+        </div>
+        <div>
+          <label class="flbl">Intervalo</label>
+          <select class="fsel" id="addIntervalo">
+            <option value="30">Cada 30 min</option>
+            <option value="60">Cada 60 min</option>
+            <option value="15">Cada 15 min</option>
+            <option value="45">Cada 45 min</option>
+          </select>
+        </div>
+        <div>
+          <label class="flbl">Cupos</label>
+          <select class="fsel" id="addCupos">
+            <option value="2">2 cupos</option>
+            <option value="3" selected>3 cupos</option>
+            <option value="1">1 cupo</option>
+            <option value="4">4 cupos</option>
+            <option value="5">5 cupos</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+        <button class="btn btn-teal" onclick="addSlotsBulk('presencial')">🏛️ Agregar franja Presencial</button>
+        <button class="btn btn-teal" onclick="addSlotsBulk('virtual')">💻 Agregar franja Virtual</button>
+        <button class="btn btn-dark" onclick="addSlotsBulk('ambos')">✚ Agregar ambas modalidades</button>
+      </div>
+    </div>
+
+    <!-- DATE NAVIGATOR -->
+    <div class="date-nav">
+      <button class="date-nav-btn" onclick="navDate(-1)">&#8249;</button>
+      <div class="date-display" id="dateDisplay">—</div>
+      <button class="date-nav-btn" onclick="navDate(1)">&#8250;</button>
+      <input class="date-input" type="date" id="jumpDate" onchange="jumpToDate(this.value)" style="margin-left:8px">
+    </div>
+
+    <!-- STATS ROW -->
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card"><div class="stat-num teal" id="statTotal">—</div><div class="stat-lbl">Slots totales</div></div>
+      <div class="stat-card"><div class="stat-num" id="statReservados">—</div><div class="stat-lbl">Turnos reservados</div></div>
+      <div class="stat-card"><div class="stat-num yellow" id="statLibres">—</div><div class="stat-lbl">Cupos libres</div></div>
+      <div class="stat-card"><div class="stat-num red" id="statLlenos">—</div><div class="stat-lbl">Slots completos</div></div>
+    </div>
+
+    <!-- SLOTS GRID -->
+    <div class="section-head">
+      <div>
+        <div class="section-ttl">Horarios del día</div>
+        <div class="section-sub">Activá o desactivá slots individualmente</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="loadSlots()">↻ Actualizar</button>
+    </div>
+    <div class="slots-grid" id="slotsGrid">
+      <div style="color:#9BA3B8;font-size:13px;grid-column:1/-1;padding:20px 0">Seleccioná una fecha para ver los slots.</div>
+    </div>
+  </div>
+
+  <!-- ── TAB: TURNOS DEL DÍA ── -->
+  <div class="panel" id="panel-turnos">
+    <div class="section-head">
+      <div>
+        <div class="section-ttl">Turnos del día</div>
+        <div class="section-sub" id="turnosDiaSub">—</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <input class="date-input" type="date" id="turnosFecha" onchange="loadTurnos()">
+        <button class="btn btn-ghost btn-sm" onclick="loadTurnos()">↻ Actualizar</button>
+        <button class="btn btn-teal btn-sm" onclick="exportarCSV()">⬇ Exportar CSV</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <div class="table-head">
+        <div>
+          <div class="table-head-ttl">Listado de turnos</div>
+          <div class="table-head-sub" id="tableCount">—</div>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>N° Turno</th>
+              <th>Hora</th>
+              <th>Apellido y Nombre</th>
+              <th>CUIL</th>
+              <th>Modalidad</th>
+              <th>Repartición</th>
+              <th>Categoría</th>
+              <th>Contrato</th>
+              <th>Paga Gan.</th>
+              <th>Teléfono</th>
+              <th>Mail</th>
+            </tr>
+          </thead>
+          <tbody id="turnosBody">
+            <tr class="empty-row"><td colspan="7">Seleccioná una fecha para ver los turnos</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: RESUMEN ── -->
+  <div class="panel" id="panel-stats">
+    <div class="section-head">
+      <div>
+        <div class="section-ttl">Resumen general</div>
+        <div class="section-sub">Vista global del estado del turnero</div>
+      </div>
+      <button class="btn btn-teal btn-sm" onclick="loadResumen()">↻ Actualizar</button>
+    </div>
+    <div id="resumenContent" style="color:#9BA3B8;font-size:13px;padding:20px 0">
+      Cargando resumen...
+    </div>
+  </div>
+
+</div>
+
+<!-- LOADING OVERLAY -->
+<div class="overlay" id="overlay">
+  <div class="overlay-box">
+    <div class="ldots"><span></span><span></span><span></span></div>
+    <p id="overlayMsg">Procesando...</p>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBmU6C2Iw7XBTl-ejroqAp1lEF3IrqjkjGqR1nz-8rMIUdlCtgL4mIHVTPi7BZ5h8d/exec';
+
+// ── ESTADO ───────────────────────────────────────────────
+let adminPwd = '';
+let currentDate = new Date();
+let currentSlots = [];
+let currentTurnos = [];
+
+// ── API ───────────────────────────────────────────────────
+async function api(params) {
+  const url = SCRIPT_URL + '?' + new URLSearchParams(params);
+  const r = await fetch(url, { redirect: 'follow' });
+  return r.json();
+}
+async function apiPost(body) {
+  const r = await fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...body, password: adminPwd }),
+    redirect: 'follow'
+  });
+  return r.json();
+}
+
+// ── LOGIN ─────────────────────────────────────────────────
+async function doLogin() {
+  const pwd = document.getElementById('pwdInput').value;
+  if (!pwd) return;
+  showOverlay('Verificando...');
+  try {
+    const res = await apiPost({ action: 'admin_login', password: pwd });
+    hideOverlay();
+    if (res.ok && res.data.ok) {
+      adminPwd = pwd;
+      document.getElementById('loginWrap').style.display = 'none';
+      document.getElementById('adminWrap').classList.add('show');
+      document.getElementById('adminBadge').style.display = 'flex';
+      document.getElementById('btnLogout').style.display = 'block';
+      initAdmin();
+    } else {
+      document.getElementById('loginErr').classList.add('show');
+    }
+  } catch(e) {
+    hideOverlay();
+    document.getElementById('loginErr').textContent = 'Error de conexión. Verificá la URL del script.';
+    document.getElementById('loginErr').classList.add('show');
+  }
+}
+
+function logout() {
+  adminPwd = '';
+  document.getElementById('loginWrap').style.display = 'flex';
+  document.getElementById('adminWrap').classList.remove('show');
+  document.getElementById('adminBadge').style.display = 'none';
+  document.getElementById('btnLogout').style.display = 'none';
+  document.getElementById('pwdInput').value = '';
+}
+
+// ── INIT ─────────────────────────────────────────────────
+function initAdmin() {
+  currentDate = new Date();
+  setDateInputs();
+  updateDateDisplay();
+  cargarConfig();
+  loadSlots();
+  const hoy = fmtDateKey(new Date());
+  document.getElementById('turnosFecha').value = hoy;
+}
+
+async function cargarConfig() {
+  try {
+    const res = await apiPost({ action: 'admin_get_config' });
+    if (!res.ok || !res.data.ok) return;
+    const cfg = res.data.config;
+    const hora = parseInt(cfg['HORA_CORTE']) || 10;
+    document.getElementById('horaCorte').value = hora;
+    document.getElementById('feriadosInput').value = cfg['DIAS_FERIADOS'] || '';
+    actualizarCorteInfo(hora, cfg['DIAS_FERIADOS'] || '');
+  } catch(e) {}
+}
+
+async function guardarConfig() {
+  const hora     = parseInt(document.getElementById('horaCorte').value);
+  const feriados = document.getElementById('feriadosInput').value.trim();
+
+  if (isNaN(hora) || hora < 0 || hora > 23) { toast('Hora inválida (0-23)', 'err'); return; }
+
+  showOverlay('Guardando configuración...');
+  try {
+    await apiPost({ action:'admin_set_config', clave:'HORA_CORTE',     valor: hora });
+    await apiPost({ action:'admin_set_config', clave:'DIAS_FERIADOS',  valor: feriados });
+    hideOverlay();
+    actualizarCorteInfo(hora, feriados);
+    toast('✓ Configuración guardada', 'ok');
+    // Recargar calendario si hay slots cargados
+    loadSlots();
+  } catch(e) {
+    hideOverlay();
+    toast('Error al guardar', 'err');
+  }
+}
+
+function actualizarCorteInfo(hora, feriados) {
+  const ahora  = new Date();
+  const horaActual = ahora.getHours();
+  const MN = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const DN = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+
+  // Calcular próximo hábil localmente (aproximado, el server hace el cálculo exacto)
+  const ferList = feriados.split(',').map(f=>f.trim()).filter(Boolean);
+  let proxHabil = new Date(ahora);
+  proxHabil.setDate(proxHabil.getDate() + 1);
+  while (true) {
+    const dow = proxHabil.getDay();
+    const key = fmtDateKey(proxHabil);
+    if (dow !== 0 && dow !== 6 && !ferList.includes(key)) break;
+    proxHabil.setDate(proxHabil.getDate() + 1);
+  }
+
+  const cerrado  = horaActual >= hora;
+  const diaLabel = DN[proxHabil.getDay()] + ' ' + proxHabil.getDate() + ' de ' + MN[proxHabil.getMonth()];
+  const estado   = cerrado
+    ? `🔒 Reservas del <strong>${diaLabel}</strong> CERRADAS (son las ${horaActual}:xx, pasó el corte de las ${hora}:00 hs)`
+    : `✅ Reservas del <strong>${diaLabel}</strong> ABIERTAS (cierran hoy a las <strong>${hora}:00 hs</strong>)`;
+
+  document.getElementById('corteInfo').innerHTML = '<span>' + estado + '</span>';
+}
+
+function setDateInputs() {
+  const key = fmtDateKey(currentDate);
+  document.getElementById('addFecha').value = key;
+  document.getElementById('jumpDate').value = key;
+}
+
+// ── TABS ─────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('on', ['slots','turnos','stats'][i] === tab);
+  });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+  document.getElementById('panel-' + tab).classList.add('on');
+  if (tab === 'turnos' && !currentTurnos.length) loadTurnos();
+  if (tab === 'stats') loadResumen();
+}
+
+// ── DATE NAVIGATION ───────────────────────────────────────
+function navDate(delta) {
+  currentDate.setDate(currentDate.getDate() + delta);
+  setDateInputs();
+  updateDateDisplay();
+  loadSlots();
+}
+
+function jumpToDate(val) {
+  if (!val) return;
+  const parts = val.split('-');
+  currentDate = new Date(+parts[0], +parts[1]-1, +parts[2]);
+  updateDateDisplay();
+  loadSlots();
+}
+
+function updateDateDisplay() {
+  const MN=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const DN=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const d = currentDate;
+  document.getElementById('dateDisplay').textContent =
+    DN[d.getDay()] + ' ' + d.getDate() + ' de ' + MN[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+// ── CARGAR SLOTS ─────────────────────────────────────────
+async function loadSlots() {
+  const fecha = fmtDateKey(currentDate);
+  showOverlay('Cargando slots...');
+  try {
+    const res = await apiPost({ action: 'admin_slots', fecha });
+    hideOverlay();
+    if (!res.ok || !res.data.ok) { toast('Error cargando slots', 'err'); return; }
+    currentSlots = res.data.slots;
+    renderSlots();
+    updateStats();
+  } catch(e) {
+    hideOverlay();
+    toast('Error de conexión', 'err');
+  }
+}
+
+function renderSlots() {
+  const grid = document.getElementById('slotsGrid');
+  if (!currentSlots.length) {
+    grid.innerHTML = '<div style="color:#9BA3B8;font-size:13px;grid-column:1/-1;padding:20px 0;text-align:center">No hay slots para este día. Usá el formulario de arriba para agregar.</div>';
+    return;
+  }
+  grid.innerHTML = '';
+  currentSlots.forEach(slot => {
+    const pct = slot.cupos > 0 ? Math.round((slot.ocupados / slot.cupos) * 100) : 0;
+    const fillClass = pct >= 100 ? 'full' : pct >= 70 ? 'warn' : '';
+    const card = document.createElement('div');
+    card.className = 'slot-card' + (!slot.activo ? ' inactivo' : '') + (slot.lleno ? ' lleno' : '');
+    card.innerHTML = `
+      <div class="slot-info">
+        <div class="slot-hora">${slot.hora} hs</div>
+        <span class="slot-mod-badge ${slot.modalidad==='presencial'?'sbp':'sbv'}">${slot.modalidad==='presencial'?'🏛️ Presencial':'💻 Virtual'}</span>
+        <div class="slot-cupos-bar">
+          <div class="cupos-txt">${slot.ocupados} / ${slot.cupos} cupos ocupados</div>
+          <div class="cupos-bar"><div class="cupos-fill ${fillClass}" style="width:${Math.min(pct,100)}%"></div></div>
+        </div>
+        ${!slot.activo ? '<div style="font-size:11px;color:#D93025;font-weight:700;margin-top:6px">⏸ Desactivado</div>' : ''}
+      </div>
+      <div class="slot-actions">
+        ${slot.activo
+          ? `<button class="btn btn-yellow btn-sm" onclick="toggleSlot('${slot.slotId}', false)">⏸ Pausar</button>`
+          : `<button class="btn btn-teal btn-sm" onclick="toggleSlot('${slot.slotId}', true)">▶ Activar</button>`
+        }
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function updateStats() {
+  const total     = currentSlots.length;
+  const reservados = currentSlots.reduce((s, sl) => s + sl.ocupados, 0);
+  const libres    = currentSlots.reduce((s, sl) => s + Math.max(0, sl.libres), 0);
+  const llenos    = currentSlots.filter(s => s.lleno).length;
+  document.getElementById('statTotal').textContent     = total;
+  document.getElementById('statReservados').textContent = reservados;
+  document.getElementById('statLibres').textContent    = libres;
+  document.getElementById('statLlenos').textContent    = llenos;
+}
+
+// ── AGREGAR SLOTS EN LOTE ─────────────────────────────────
+async function addSlotsBulk(modo) {
+  const fecha    = document.getElementById('addFecha').value;
+  const inicio   = document.getElementById('addHoraInicio').value;
+  const fin      = document.getElementById('addHoraFin').value;
+  const intervalo= parseInt(document.getElementById('addIntervalo').value);
+  const cupos    = parseInt(document.getElementById('addCupos').value);
+
+  if (!fecha || !inicio || !fin) { toast('Completá todos los campos', 'err'); return; }
+
+  const franjas = generarFranjas(inicio, fin, intervalo);
+  if (!franjas.length) { toast('No se generaron franjas con esos horarios', 'err'); return; }
+
+  const modalidades = modo === 'ambos' ? ['presencial','virtual'] : [modo];
+  const total = franjas.length * modalidades.length;
+
+  showOverlay(`Agregando ${total} slots...`);
+  let ok = 0;
+  for (const hora of franjas) {
+    for (const mod of modalidades) {
+      try {
+        const res = await apiPost({ action: 'admin_add_slot', fecha, hora, modalidad: mod, cupos });
+        if (res.ok && res.data.ok) ok++;
+      } catch(e) {}
+    }
+  }
+  hideOverlay();
+  toast(`✓ ${ok} slots agregados correctamente`, 'ok');
+
+  // Si la fecha agregada es la que estamos viendo, recargar
+  if (fecha === fmtDateKey(currentDate)) {
+    // Actualizar la fecha visualizada si es diferente
+    const parts = fecha.split('-');
+    currentDate = new Date(+parts[0], +parts[1]-1, +parts[2]);
+    updateDateDisplay();
+    document.getElementById('jumpDate').value = fecha;
+    loadSlots();
+  }
+}
+
+function generarFranjas(inicio, fin, intervalo) {
+  const franjas = [];
+  let [h, m] = inicio.split(':').map(Number);
+  const [hf, mf] = fin.split(':').map(Number);
+  const finMin = hf * 60 + mf;
+  while (h * 60 + m < finMin) {
+    franjas.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+    m += intervalo;
+    if (m >= 60) { h += Math.floor(m/60); m = m % 60; }
+  }
+  return franjas;
+}
+
+// ── TOGGLE SLOT ───────────────────────────────────────────
+async function toggleSlot(slotId, activo) {
+  showOverlay(activo ? 'Activando slot...' : 'Pausando slot...');
+  try {
+    const res = await apiPost({ action: 'admin_toggle_slot', slotId, activo });
+    hideOverlay();
+    if (res.ok && res.data.ok) {
+      toast(activo ? '✓ Slot activado' : '⏸ Slot pausado', 'ok');
+      loadSlots();
+    } else {
+      toast('Error al modificar slot', 'err');
+    }
+  } catch(e) {
+    hideOverlay();
+    toast('Error de conexión', 'err');
+  }
+}
+
+// ── TURNOS DEL DÍA ────────────────────────────────────────
+async function loadTurnos() {
+  const fecha = document.getElementById('turnosFecha').value;
+  if (!fecha) return;
+  showOverlay('Cargando turnos...');
+  try {
+    const res = await apiPost({ action: 'admin_turnos_dia', fecha });
+    hideOverlay();
+    if (!res.ok || !res.data.ok) { toast('Error cargando turnos', 'err'); return; }
+    currentTurnos = res.data.turnos;
+    renderTurnos(fecha);
+  } catch(e) {
+    hideOverlay();
+    toast('Error de conexión', 'err');
+  }
+}
+
+function renderTurnos(fecha) {
+  const MN=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const p = fecha.split('-');
+  const d = new Date(+p[0], +p[1]-1, +p[2]);
+  const fechaLinda = d.getDate() + ' de ' + MN[d.getMonth()] + ' ' + p[0];
+
+  document.getElementById('turnosDiaSub').textContent = fechaLinda;
+  document.getElementById('tableCount').textContent = currentTurnos.length + ' turno' + (currentTurnos.length!==1?'s':'') + ' reservado' + (currentTurnos.length!==1?'s':'');
+
+  const tbody = document.getElementById('turnosBody');
+  if (!currentTurnos.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Sin turnos para este día</td></tr>';
+    return;
+  }
+  tbody.innerHTML = currentTurnos.map(t => `
+    <tr>
+      <td><span style="color:#00B4A6;font-weight:800">${t.numero}</span></td>
+      <td><strong>${t.hora} hs</strong></td>
+      <td>${t.nombre}</td>
+      <td class="muted">${t.cuil}</td>
+      <td><span class="badge ${t.modalidad==='presencial'?'badge-p':'badge-v'}">${t.modalidad==='presencial'?'🏛️ Presencial':'💻 Virtual'}</span></td>
+      <td class="muted" style="font-size:12px">${t.reparticion || '—'}</td>
+      <td class="muted" style="font-size:12px">${t.categoria || '—'}</td>
+      <td class="muted" style="font-size:12px">${t.modalidadContrato || '—'}</td>
+      <td style="font-size:12px;font-weight:700;color:${t.pagaGanancias==='SI'?'#00875A':'#5C6478'}">${t.pagaGanancias || '—'}</td>
+      <td class="muted">${t.telefono || '—'}</td>
+      <td class="muted" style="font-size:12px">${t.mail}</td>
+    </tr>`).join('');
+}
+
+// ── EXPORTAR CSV ──────────────────────────────────────────
+function exportarCSV() {
+  if (!currentTurnos.length) { toast('No hay turnos para exportar', 'err'); return; }
+  const headers = ['N° Turno','Hora','Apellido y Nombre','CUIL','Modalidad turno',
+                   'Repartición','Sector','Categoría','Modalidad contrato','Bruto anual','Paga Ganancias',
+                   'Teléfono','Mail'];
+  const rows = currentTurnos.map(t => [
+    t.numero, t.hora, t.nombre, t.cuil,
+    t.modalidad === 'presencial' ? 'Presencial' : 'Virtual',
+    t.reparticion || '', t.sector || '', t.categoria || '',
+    t.modalidadContrato || '', t.brutoAnual || '', t.pagaGanancias || '',
+    t.telefono || '', t.mail
+  ]);
+  const csv = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `turnos_${document.getElementById('turnosFecha').value}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+  toast('✓ CSV exportado', 'ok');
+}
+
+// ── RESUMEN GENERAL ───────────────────────────────────────
+async function loadResumen() {
+  const hoy = fmtDateKey(new Date());
+  showOverlay('Cargando resumen...');
+  try {
+    // Carga los próximos 7 días hábiles
+    const resContent = document.getElementById('resumenContent');
+    const dias = [];
+    let d = new Date();
+    let count = 0;
+    while (count < 10) {
+      const dow = d.getDay();
+      if (dow !== 0 && dow !== 6) {
+        dias.push(fmtDateKey(d));
+        count++;
+      }
+      d.setDate(d.getDate() + 1);
+    }
+
+    const results = await Promise.all(
+      dias.map(fecha => apiPost({ action: 'admin_slots', fecha })
+        .then(r => ({ fecha, slots: (r.ok && r.data.ok) ? r.data.slots : [] }))
+        .catch(() => ({ fecha, slots: [] }))
+      )
+    );
+    hideOverlay();
+
+    const MN=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    const DN=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+
+    resContent.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
+        ${results.map(({ fecha, slots }) => {
+          const p = fecha.split('-');
+          const dd = new Date(+p[0],+p[1]-1,+p[2]);
+          const total = slots.reduce((s,sl) => s + sl.cupos, 0);
+          const ocup  = slots.reduce((s,sl) => s + sl.ocupados, 0);
+          const libres = total - ocup;
+          const pct   = total > 0 ? Math.round(ocup/total*100) : 0;
+          const color = pct >= 90 ? '#D93025' : pct >= 60 ? '#856404' : '#00875A';
+          return `<div style="background:#fff;border:1px solid #DDE1EA;border-radius:10px;padding:16px">
+            <div style="font-size:11px;font-weight:700;color:#9BA3B8;text-transform:uppercase;letter-spacing:.06em">${DN[dd.getDay()]} ${dd.getDate()} ${MN[dd.getMonth()]}</div>
+            <div style="font-size:24px;font-weight:800;color:${color};margin:6px 0">${libres}<span style="font-size:14px;color:#9BA3B8;font-weight:600">/${total}</span></div>
+            <div style="font-size:12px;color:#5C6478;font-weight:600">cupos libres</div>
+            <div style="height:4px;background:#DDE1EA;border-radius:2px;margin-top:10px;overflow:hidden">
+              <div style="height:100%;background:${color};width:${pct}%;border-radius:2px"></div>
+            </div>
+            <div style="font-size:11px;color:#9BA3B8;margin-top:4px">${pct}% ocupado · ${slots.length} slots</div>
+          </div>`;
+        }).join('')}
+      </div>`;
+  } catch(e) {
+    hideOverlay();
+    toast('Error cargando resumen', 'err');
+  }
+}
+
+// ── HELPERS ───────────────────────────────────────────────
+function fmtDateKey(d) {
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function showOverlay(msg) {
+  document.getElementById('overlayMsg').textContent = msg;
+  document.getElementById('overlay').classList.add('show');
+}
+function hideOverlay() {
+  document.getElementById('overlay').classList.remove('show');
+}
+
+let toastTimer;
+function toast(msg, type='ok') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Enter en password
+document.getElementById('pwdInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+</script>
+</body>
+</html>
