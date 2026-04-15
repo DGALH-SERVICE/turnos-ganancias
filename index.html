@@ -550,10 +550,9 @@ function apiCall(params) {
     const script = document.createElement('script');
     const timer = setTimeout(() => {
       // No borramos el callback — Apps Script puede tardar con muchos datos
-      // Solo limpiamos el script tag
       if (script.parentNode) script.parentNode.removeChild(script);
-      // Dejamos el callback activo 30s más por si llega tarde
-      setTimeout(() => { delete window[cbName]; }, 30000);
+      // Dejar el callback activo 90s más — necesario para reservas con 300k filas
+      setTimeout(() => { delete window[cbName]; }, 90000);
       reject(new Error('Timeout'));
     }, 30000);  // 30 segundos para dar tiempo a búsquedas en planillas grandes
     function cleanup() {
