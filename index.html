@@ -697,6 +697,14 @@ async function cargarModificacionDesdeToken(token) {
       // Saltear paso 1 y mostrar paso 2 directamente
       document.getElementById('pn').textContent = t.nombre;
       document.getElementById('pc').textContent = t.cuil;
+      // Precargar teléfono y mail
+      if (t.telefono) document.getElementById('ti').value = t.telefono;
+      document.getElementById('mi').value  = t.mail;
+      document.getElementById('mi2').value = t.mail;
+      document.getElementById('mi').classList.add('ok');
+      document.getElementById('mi2').classList.add('ok');
+      document.getElementById('mailMatchHint').textContent = '✓ Mail verificado';
+      document.getElementById('mailMatchHint').className = 'fhint ok';
       await cargarDiasDisponibles();
       renderCal();
       document.getElementById('modBanner').classList.add('show');
@@ -723,6 +731,10 @@ async function goS2() {
   document.getElementById('pn').textContent = ST.nom;
   document.getElementById('pc').textContent = document.getElementById('ci').value || ST.cuil;
 
+  // Limpiar siempre el banner primero
+  document.getElementById('modBanner').classList.remove('show');
+  document.getElementById('s2Ttl').textContent = 'Elegí fecha, modalidad y horario';
+
   // Si es modificación mostrar banner y precargar mail
   if (ST.esModificacion) {
     document.getElementById('modBanner').classList.add('show');
@@ -730,17 +742,22 @@ async function goS2() {
     if (ST._mailVerificadoValor) {
       document.getElementById('mi').value  = ST._mailVerificadoValor;
       document.getElementById('mi2').value = ST._mailVerificadoValor;
-      document.getElementById('mi').classList.add('ok');
-      document.getElementById('mi2').classList.add('ok');
+      document.getElementById('mi').classList.add('ok');  document.getElementById('mi').classList.remove('err');
+      document.getElementById('mi2').classList.add('ok'); document.getElementById('mi2').classList.remove('err');
       document.getElementById('mailMatchHint').textContent = '✓ Mail verificado';
       document.getElementById('mailMatchHint').className = 'fhint ok';
+      // Disparar chk2 manualmente para habilitar el botón
+      chk2();
     }
   } else {
     document.getElementById('modBanner').classList.remove('show');
     document.getElementById('s2Ttl').textContent = 'Elegí fecha, modalidad y horario';
   }
 
+  // Mostrar pantalla inmediatamente con spinner en el calendario
   show(2);
+  document.getElementById('cdg').innerHTML = '<div style="grid-column:1/-1;padding:30px;text-align:center"><div class="ldots" style="display:inline-flex"><span></span><span></span><span></span></div><div style="font-size:12px;color:#9BA3B8;margin-top:8px">Cargando disponibilidad...</div></div>';
+  document.getElementById('sl').innerHTML = '<div class="sempty">Cargando horarios disponibles...</div>';
   await cargarDiasDisponibles();
   renderCal();
 }
@@ -835,9 +852,12 @@ async function confirmar() {
 }
 
 function reset_() {
-  ST = { cuil:'', nom:'', date:null, slotObj:null, mod:'presencial',
-         tel:'', mail:'', mon:new Date(), diasDisp:{},
-         esModificacion:false, tokenAnterior:null, mailVerificado:false, turnoVigente:null };
+  ST = {
+    cuil:'', nom:'', date:null, slotObj:null, mod:'presencial',
+    tel:'', mail:'', mon:null, diasDisp:{}, corteFecha:null,
+    esModificacion:false, tokenAnterior:null, mailVerificado:false,
+    turnoVigente:null, _mailVerificadoValor:null
+  };
   ST.mon = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
   const ci = document.getElementById('ci');
   if (ci) { ci.value=''; ci.classList.remove('ok','err'); }
@@ -846,6 +866,9 @@ function reset_() {
   document.getElementById('mi2').value = '';
   document.getElementById('mailMatchHint').textContent = 'Ingresá el mail nuevamente para confirmar';
   document.getElementById('mailMatchHint').className = 'fhint';
+  // Limpiar banner de modificación
+  document.getElementById('modBanner').classList.remove('show');
+  document.getElementById('s2Ttl').textContent = 'Elegí fecha, modalidad y horario';
   ocultarTodos();
   document.getElementById('bs1').disabled = true;
   show(1);
@@ -938,9 +961,14 @@ async function selDate(key, el) {
   const p=key.split('-');
   const dobj=new Date(+p[0],+p[1]-1,+p[2]);
   const dn=DN[dobj.getDay()];
-  document.getElementById('sdtxt').textContent =
-    dn.charAt(0).toUpperCase()+dn.slice(1)+' '+parseInt(p[2])+' de '+MN[dobj.getMonth()];
-  document.getElementById('sl').innerHTML='<div class="sempty"><div class="ldots" style="display:block"><span></span><span></span><span></span></div></div>';
+  const fechaLabel = dn.charAt(0).toUpperCase()+dn.slice(1)+' '+parseInt(p[2])+' de '+MN[dobj.getMonth()];
+  document.getElementById('sdtxt').textContent = fechaLabel;
+  document.getElementById('ssub').textContent = 'Cargando horarios...';
+  document.getElementById('sl').innerHTML = `
+    <div class="sempty">
+      <div class="ldots" style="display:inline-flex;margin-bottom:8px"><span></span><span></span><span></span></div>
+      <div>Buscando turnos para ${fechaLabel}...</div>
+    </div>`;
   updSum(); chk2();
   await renderSlots();
 }
