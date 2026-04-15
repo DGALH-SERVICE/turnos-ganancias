@@ -337,8 +337,8 @@ body { font-family:'Nunito Sans','Segoe UI',Arial,sans-serif; background:#F4F5F7
     </div>
 
     <!-- Banner cuando es modificación -->
-    <div class="mod-banner" id="modBanner">
-      ✏️ <span>Estás <strong>modificando</strong> tu turno anterior. El nuevo turno reemplazará al existente.</span>
+    <div class="mod-banner" id="modBanner" style="display:none">
+      ✏️ <span id="modBannerTxt">Estás modificando tu turno anterior. El nuevo turno reemplazará al existente.</span>
     </div>
 
     <div class="bkgrid">
@@ -534,7 +534,16 @@ let _cbCount = 0;
 function apiCall(params) {
   return new Promise((resolve, reject) => {
     const cbName = '_gcb' + (++_cbCount);
-    const url = SCRIPT_URL + '?' + new URLSearchParams({...params, callback: cbName});
+    // Construir URL manualmente para evitar doble encoding del campo data=
+    const allParams = {...params, callback: cbName};
+    const urlParts = Object.entries(allParams).map(([k, v]) => {
+      if (k === 'data' && typeof v === 'string') {
+        // data ya es un JSON string, encodificarlo una sola vez
+        return k + '=' + encodeURIComponent(v);
+      }
+      return encodeURIComponent(k) + '=' + encodeURIComponent(v);
+    });
+    const url = SCRIPT_URL + '?' + urlParts.join('&');
     const script = document.createElement('script');
     const timer = setTimeout(() => {
       // No borramos el callback — Apps Script puede tardar con muchos datos
@@ -754,12 +763,20 @@ async function goS2() {
     document.getElementById('s2Ttl').textContent = 'Elegí fecha, modalidad y horario';
   }
 
-  // Mostrar pantalla inmediatamente con spinner en el calendario
+  // Mostrar pantalla inmediatamente
   show(2);
-  document.getElementById('cdg').innerHTML = '<div style="grid-column:1/-1;padding:30px;text-align:center"><div class="ldots" style="display:inline-flex"><span></span><span></span><span></span></div><div style="font-size:12px;color:#9BA3B8;margin-top:8px">Cargando disponibilidad...</div></div>';
-  document.getElementById('sl').innerHTML = '<div class="sempty">Cargando horarios disponibles...</div>';
+  // Renderizar el calendario con el mes actual primero (sin disponibilidad aún)
+  renderCal();
+  // Mostrar aviso de carga solo en los slots
+  document.getElementById('sdtxt').textContent = 'Cargando disponibilidad...';
+  document.getElementById('ssub').textContent = 'Por favor esperá un momento';
+  document.getElementById('sl').innerHTML = '<div class="sempty"><div class="ldots" style="display:inline-flex;margin-bottom:6px"><span></span><span></span><span></span></div><br>Cargando turnos disponibles...</div>';
+  // Cargar disponibilidad y re-renderizar el calendario con los días marcados
   await cargarDiasDisponibles();
   renderCal();
+  document.getElementById('sdtxt').textContent = 'Seleccioná un día en el calendario';
+  document.getElementById('ssub').textContent = 'Los horarios disponibles aparecerán aquí';
+  document.getElementById('sl').innerHTML = '<div class="sempty">↑ Elegí un día disponible</div>';
 }
 
 function goS3() {
@@ -1044,3 +1061,4 @@ function fmtL(key) {
 </script>
 </body>
 </html>
+
