@@ -396,26 +396,41 @@ let currentTurnos = [];
 
 // ── API ───────────────────────────────────────────────────
 // Todo por GET para evitar CORS con Apps Script
-async function api(params) {
-  const r = await fetch(SCRIPT_URL + '?' + new URLSearchParams(params), { redirect:'follow' });
-  return r.json();
+// ── API con JSONP para evitar CORS con Apps Script ────────
+let _cbCount = 0;
+function apiCall(params) {
+  return new Promise((resolve, reject) => {
+    const cbName = '_gcb' + (++_cbCount);
+    const url = SCRIPT_URL + '?' + new URLSearchParams({...params, callback: cbName});
+    const script = document.createElement('script');
+    const timer = setTimeout(() => {
+      cleanup();
+      reject(new Error('Timeout'));
+    }, 15000);
+    function cleanup() {
+      clearTimeout(timer);
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+    window[cbName] = function(data) {
+      cleanup();
+      resolve(data);
+    };
+    script.onerror = () => { cleanup(); reject(new Error('Error de conexión')); };
+    script.src = url;
+    document.head.appendChild(script);
+  });
 }
+async function api(params) { return apiCall(params); }
 async function apiPost(body) {
-  // pwd: si viene en el body lo usa, si no usa adminPwd (sesión activa)
-  const pwd = body.pwd || adminPwd;
+  const pwd = body.pwd || (typeof adminPwd !== 'undefined' ? adminPwd : '');
   const action = body.action;
-  // Mandamos TODO en data= (excepto action y pwd que van como parámetros directos)
   const payload = Object.fromEntries(
     Object.entries(body).filter(([k]) => k !== 'action' && k !== 'pwd' && k !== 'password')
   );
-  const params = new URLSearchParams({
-    action,
-    pwd,
-    data: encodeURIComponent(JSON.stringify(payload))
-  });
-  const r = await fetch(SCRIPT_URL + '?' + params.toString(), { redirect:'follow' });
-  return r.json();
+  return apiCall({ action, pwd, data: JSON.stringify(payload) });
 }
+
 
 // ── LOGIN ─────────────────────────────────────────────────
 async function doLogin() {
@@ -848,4 +863,3 @@ document.getElementById('pwdInput').addEventListener('keydown', e => {
 </script>
 </body>
 </html>
-
