@@ -528,16 +528,15 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // ── API ───────────────────────────────────────────────────
+// Todo por GET para evitar CORS con Apps Script
 async function api(params) {
   const r = await fetch(SCRIPT_URL + '?' + new URLSearchParams(params), { redirect:'follow' });
   return r.json();
 }
 async function apiPost(body) {
-  const r = await fetch(SCRIPT_URL, {
-    method:'POST', redirect:'follow',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify(body),
-  });
+  const { action, ...rest } = body;
+  const data = encodeURIComponent(JSON.stringify(rest));
+  const r = await fetch(SCRIPT_URL + '?action=' + action + '&data=' + data, { redirect:'follow' });
   return r.json();
 }
 
