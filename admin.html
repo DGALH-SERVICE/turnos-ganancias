@@ -401,16 +401,16 @@ async function api(params) {
   return r.json();
 }
 async function apiPost(body) {
-  const allBody = { ...body, pwd: adminPwd };
-  const { action, data: dataField, ...rest } = allBody;
-  // Campos simples van directo, objetos complejos van en data=
-  const params = new URLSearchParams({ action });
-  if (rest.pwd) params.set('pwd', rest.pwd);
-  if (rest.fecha) params.set('fecha', rest.fecha);
-  if (rest.slotId) params.set('slotId', rest.slotId);
-  if (rest.activo !== undefined) params.set('activo', rest.activo);
-  // Campos que no son simples van en data=
-  const complex = Object.fromEntries(Object.entries(rest).filter(([k]) => !['pwd','fecha','slotId','activo','password'].includes(k)));
+  // pwd: si viene en el body lo usa, si no usa adminPwd (sesión activa)
+  const pwd = body.pwd || adminPwd;
+  const action = body.action;
+  const params = new URLSearchParams({ action, pwd });
+  if (body.fecha)  params.set('fecha', body.fecha);
+  if (body.slotId) params.set('slotId', body.slotId);
+  if (body.activo !== undefined) params.set('activo', body.activo);
+  // Todo lo demás va en data=
+  const skip = ['action','pwd','password','fecha','slotId','activo'];
+  const complex = Object.fromEntries(Object.entries(body).filter(([k]) => !skip.includes(k)));
   if (Object.keys(complex).length > 0) params.set('data', encodeURIComponent(JSON.stringify(complex)));
   const r = await fetch(SCRIPT_URL + '?' + params.toString(), { redirect:'follow' });
   return r.json();
