@@ -390,6 +390,9 @@ body { font-family:'Nunito Sans','Segoe UI',Arial,sans-serif; background:#F4F5F7
           </div>
         </div>
 
+        <!-- Aviso dirección / modalidad -->
+        <div id="avisoModalidad" style="display:none;border-radius:10px;padding:13px 15px;margin-bottom:13px;font-size:13px;line-height:1.5;border:1.5px solid #DDE1EA;background:#fff"></div>
+
         <div class="pcard">
           <div class="phd">Datos de contacto</div>
           <div class="ctp">
@@ -1041,6 +1044,19 @@ function updSum() {
   else{ph.textContent='Sin seleccionar';ph.classList.add('mt');}
   pm.textContent=ST.mod==='presencial'?'🏛️ Presencial':'💻 Virtual';
   pm.classList.remove('mt');
+  // Mostrar aviso de dirección o meet según modalidad
+  const aviso = document.getElementById('avisoModalidad');
+  if (ST.mod === 'presencial') {
+    aviso.style.display = 'block';
+    aviso.style.background = '#FFF8CC';
+    aviso.style.borderColor = '#FDE68A';
+    aviso.innerHTML = '📍 <strong>Turno presencial</strong><br>Av. Martín García 346, CABA — Planta baja, mesa de entradas.<br><span style="font-size:12px;color:#78350F">Presentate con tu DNI el día del turno.</span>';
+  } else {
+    aviso.style.display = 'block';
+    aviso.style.background = '#E6F8F7';
+    aviso.style.borderColor = '#B3E8E5';
+    aviso.innerHTML = '💻 <strong>Turno virtual</strong><br>Te enviaremos el enlace de Google Meet unos minutos antes del turno al mail que registres.<br><span style="font-size:12px;color:#00524D">Revisá también tu carpeta de spam.</span>';
+  }
 }
 
 function chk2() {
@@ -1061,4 +1077,3 @@ function fmtL(key) {
 </script>
 </body>
 </html>
-
