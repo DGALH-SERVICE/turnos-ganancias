@@ -527,7 +527,21 @@ window.addEventListener('DOMContentLoaded', () => {
   // Si viene con token de modificación desde el mail
   const params = new URLSearchParams(window.location.search);
   const tokenMod = params.get('modificar');
-  if (tokenMod) cargarModificacionDesdeToken(tokenMod);
+  if (tokenMod) {
+    // Mostrar overlay de carga mientras se inicializa la modificación
+    document.body.insertAdjacentHTML('beforeend', `
+      <div id="initOverlay" style="position:fixed;inset:0;background:rgba(26,31,46,0.7);z-index:9999;display:flex;align-items:center;justify-content:center">
+        <div style="background:#fff;border-radius:12px;padding:32px 40px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.2)">
+          <div style="font-size:28px;margin-bottom:12px">🔄</div>
+          <div style="font-size:16px;font-weight:700;color:#1A1F2E;margin-bottom:6px">Cargando tu turno...</div>
+          <div style="font-size:13px;color:#5C6478">Por favor esperá un momento</div>
+        </div>
+      </div>`);
+    cargarModificacionDesdeToken(tokenMod).finally(() => {
+      const ov = document.getElementById('initOverlay');
+      if (ov) ov.remove();
+    });
+  }
 });
 
 // ── API ───────────────────────────────────────────────────
@@ -616,7 +630,10 @@ function ocultarTodos() {
 
 async function buscarCUIL(cuil) {
   try {
-    const res = await api({ action: 'cuil', cuil });
+    // Si es modificación, pasar el token a excluir para que no bloquee
+    const params = { action: 'cuil', cuil };
+    if (ST.tokenAnterior) params.tokenExcluir = ST.tokenAnterior;
+    const res = await api(params);
     document.getElementById('ld').style.display = 'none';
 
     if (!res.ok || !res.data.found) {
@@ -721,8 +738,12 @@ async function cargarModificacionDesdeToken(token) {
       document.getElementById('modBanner').classList.add('show');
       document.getElementById('s2Ttl').textContent = 'Elegí el nuevo horario';
       show(2);
+      // Habilitar botón si teléfono y mail ya están precargados
+      chk2();
     }
-  } catch(e) {}
+  } catch(e) {
+    console.error('Error cargando modificación:', e);
+  }
 }
 
 // ── NAVEGACIÓN ────────────────────────────────────────────
