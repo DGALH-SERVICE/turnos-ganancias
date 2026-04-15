@@ -395,18 +395,24 @@ let currentSlots = [];
 let currentTurnos = [];
 
 // ── API ───────────────────────────────────────────────────
+// Todo por GET para evitar CORS con Apps Script
 async function api(params) {
-  const url = SCRIPT_URL + '?' + new URLSearchParams(params);
-  const r = await fetch(url, { redirect: 'follow' });
+  const r = await fetch(SCRIPT_URL + '?' + new URLSearchParams(params), { redirect:'follow' });
   return r.json();
 }
 async function apiPost(body) {
-  const r = await fetch(SCRIPT_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...body, password: adminPwd }),
-    redirect: 'follow'
-  });
+  const allBody = { ...body, pwd: adminPwd };
+  const { action, data: dataField, ...rest } = allBody;
+  // Campos simples van directo, objetos complejos van en data=
+  const params = new URLSearchParams({ action });
+  if (rest.pwd) params.set('pwd', rest.pwd);
+  if (rest.fecha) params.set('fecha', rest.fecha);
+  if (rest.slotId) params.set('slotId', rest.slotId);
+  if (rest.activo !== undefined) params.set('activo', rest.activo);
+  // Campos que no son simples van en data=
+  const complex = Object.fromEntries(Object.entries(rest).filter(([k]) => !['pwd','fecha','slotId','activo','password'].includes(k)));
+  if (Object.keys(complex).length > 0) params.set('data', encodeURIComponent(JSON.stringify(complex)));
+  const r = await fetch(SCRIPT_URL + '?' + params.toString(), { redirect:'follow' });
   return r.json();
 }
 
@@ -416,7 +422,7 @@ async function doLogin() {
   if (!pwd) return;
   showOverlay('Verificando...');
   try {
-    const res = await apiPost({ action: 'admin_login', password: pwd });
+    const res = await apiPost({ action: 'adminLogin', pwd: pwd });
     hideOverlay();
     if (res.ok && res.data.ok) {
       adminPwd = pwd;
@@ -457,7 +463,7 @@ function initAdmin() {
 
 async function cargarConfig() {
   try {
-    const res = await apiPost({ action: 'admin_get_config' });
+    const res = await apiPost({ action: 'adminGetConfig' });
     if (!res.ok || !res.data.ok) return;
     const cfg = res.data.config;
     const hora = parseInt(cfg['HORA_CORTE']) || 10;
@@ -560,7 +566,7 @@ async function loadSlots() {
   const fecha = fmtDateKey(currentDate);
   showOverlay('Cargando slots...');
   try {
-    const res = await apiPost({ action: 'admin_slots', fecha });
+    const res = await apiPost({ action: 'adminSlots', fecha });
     hideOverlay();
     if (!res.ok || !res.data.ok) { toast('Error cargando slots', 'err'); return; }
     currentSlots = res.data.slots;
@@ -636,7 +642,7 @@ async function addSlotsBulk(modo) {
   for (const hora of franjas) {
     for (const mod of modalidades) {
       try {
-        const res = await apiPost({ action: 'admin_add_slot', fecha, hora, modalidad: mod, cupos });
+        const res = await apiPost({ action: 'adminAddSlot', fecha, hora, modalidad: mod, cupos });
         if (res.ok && res.data.ok) ok++;
       } catch(e) {}
     }
@@ -672,7 +678,7 @@ function generarFranjas(inicio, fin, intervalo) {
 async function toggleSlot(slotId, activo) {
   showOverlay(activo ? 'Activando slot...' : 'Pausando slot...');
   try {
-    const res = await apiPost({ action: 'admin_toggle_slot', slotId, activo });
+    const res = await apiPost({ action: 'adminToggleSlot', slotId, activo });
     hideOverlay();
     if (res.ok && res.data.ok) {
       toast(activo ? '✓ Slot activado' : '⏸ Slot pausado', 'ok');
@@ -692,7 +698,7 @@ async function loadTurnos() {
   if (!fecha) return;
   showOverlay('Cargando turnos...');
   try {
-    const res = await apiPost({ action: 'admin_turnos_dia', fecha });
+    const res = await apiPost({ action: 'adminTurnosDia', fecha });
     hideOverlay();
     if (!res.ok || !res.data.ok) { toast('Error cargando turnos', 'err'); return; }
     currentTurnos = res.data.turnos;
@@ -775,7 +781,7 @@ async function loadResumen() {
     }
 
     const results = await Promise.all(
-      dias.map(fecha => apiPost({ action: 'admin_slots', fecha })
+      dias.map(fecha => apiPost({ action: 'adminSlots', fecha })
         .then(r => ({ fecha, slots: (r.ok && r.data.ok) ? r.data.slots : [] }))
         .catch(() => ({ fecha, slots: [] }))
       )
@@ -841,4 +847,3 @@ document.getElementById('pwdInput').addEventListener('keydown', e => {
 </script>
 </body>
 </html>
-
