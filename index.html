@@ -253,7 +253,7 @@ body { font-family:'Nunito Sans','Segoe UI',Arial,sans-serif; background:#F4F5F7
       <div class="scr-head">
         <div class="scr-eye">Paso 1 de 3</div>
         <div class="scr-ttl">Ingresá tu CUIL para comenzar</div>
-        <div class="scr-sub">Verificamos tus datos en el padrón de empleados del GCABA automáticamente.</div>
+        <div class="scr-sub">Verificamos tus datos automáticamente.</div>
       </div>
       <div class="card" style="padding:26px">
 
@@ -286,7 +286,7 @@ body { font-family:'Nunito Sans','Segoe UI',Arial,sans-serif; background:#F4F5F7
             <div class="tv-ico">📅</div>
             <div>
               <div class="tv-ttl">Ya tenés un turno agendado</div>
-              <div class="tv-sub">Si querés modificarlo, verificá tu identidad con el mail que registraste</div>
+              <div class="tv-sub">Para modificarlo ingresá el mail con el que lo registraste, o usá el enlace que recibiste en tu correo electrónico.</div>
             </div>
           </div>
           <div class="tv-datos">
@@ -487,7 +487,7 @@ body { font-family:'Nunito Sans','Segoe UI',Arial,sans-serif; background:#F4F5F7
         </div>
       </div>
       <div class="mtag">📬 Se envió confirmación a tu mail con el enlace para cancelar o modificar.</div>
-      <button class="btn btn-ghost" onclick="reset_()">Sacar otro turno</button>
+      <button class="btn btn-ghost" onclick="window.location.href='https://dgalh-service.github.io/turnos-ganancias/'">Sacar otro turno</button>
     </div>
   </div>
 
@@ -877,7 +877,11 @@ async function confirmar() {
       }
       show(4);
     } else {
-      const msg = (res.data && res.data.error) || res.error || 'Error desconocido';
+      let msg = (res.data && res.data.error) || res.error || 'Error desconocido';
+      // Mensaje más claro cuando ya tiene turno activo
+      if (msg.includes('turno activo')) {
+        msg = 'Ya tenés un turno registrado. Para modificarlo usá el enlace que recibiste en tu correo electrónico.';
+      }
       document.getElementById('s3errtxt').textContent = msg;
       document.getElementById('s3err').classList.add('show');
       btn.disabled = false;
